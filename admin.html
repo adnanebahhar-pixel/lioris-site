@@ -1,0 +1,160 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Administration | Lioris (maquette)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="v4.css"><link rel="stylesheet" href="v4-pages.css">
+<style>
+/* Maquette de l'outil d'administration (2026-11-22). Donnees fictives, rien n'est enregistre. Sert a decider ce qu'on construit. */
+body.admin { background:var(--bande); font-size:16px; }
+.cadre { display:grid; grid-template-columns:232px minmax(0,1fr); min-height:calc(100vh - 31px); }
+.menu { background:var(--sombre); color:var(--sombre-ink); padding:20px 14px; display:flex; flex-direction:column; gap:4px; position:sticky; top:0; height:100vh; overflow:auto; }
+.menu .brand { color:#FFFFFF; font-size:22px; margin:0 8px 18px; }
+.menu .brand svg rect { fill:#FFFFFF; } .menu .brand svg path { stroke:#17203A; }
+.menu button { display:flex; justify-content:space-between; align-items:center; gap:8px; width:100%; text-align:left; font:inherit; font-weight:600; font-size:15px; color:var(--sombre-muted); background:transparent; border:0; border-radius:6px; padding:9px 10px; cursor:pointer; }
+.menu button:hover { color:#FFFFFF; }
+.menu button[aria-current="page"] { background:rgba(255,255,255,.12); color:#FFFFFF; }
+.menu button b { font-size:12px; font-weight:700; background:var(--surligne); color:#17203A; border-radius:99px; padding:1px 8px; }
+.menu .sep { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#7F89A8; margin:16px 10px 4px; }
+.zone { padding:28px 32px 64px; min-width:0; }
+.zone h1 { font-size:34px; line-height:1.05; margin:0 0 6px; }
+.zone .sous-titre { color:var(--muted); margin:0 0 24px; }
+.zone h2 { font-size:21px; margin:0 0 12px; letter-spacing:-.015em; }
+.bloc { background:var(--feuille); border:1px solid var(--line); border-radius:6px; padding:18px 20px; margin:0 0 16px; min-width:0; }
+.chiffres { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; margin:0 0 16px; }
+.chiffres .bloc { margin:0; }
+.chiffres b { display:block; font-family:var(--titre); font-size:36px; line-height:1; letter-spacing:-.03em; font-variant-numeric:tabular-nums; }
+.chiffres span { font-size:13.5px; color:var(--muted); }
+.deux { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr); gap:16px; }
+.afaire { list-style:none; margin:0; padding:0; }
+.afaire li { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:12px; align-items:center; padding:11px 0; border-top:1px solid var(--line); margin:0; }
+.afaire li:first-child { border-top:0; }
+.afaire small { display:block; color:var(--muted); font-size:13.5px; }
+.pt { width:10px; height:10px; border-radius:50%; background:var(--rouge); } .pt.j { background:#E8A13A; } .pt.v { background:#2F9E5B; }
+.act { font:inherit; font-size:13.5px; font-weight:600; background:transparent; border:1.5px solid var(--ink); border-radius:6px; padding:5px 10px; cursor:pointer; color:var(--ink); white-space:nowrap; }
+.act:hover { background:var(--ink); color:#FFFFFF; }
+.act.plein { background:var(--cta); border-color:var(--cta); color:#FFFFFF; }
+.tuyau { display:grid; grid-template-columns:repeat(5, minmax(150px,1fr)); gap:10px; overflow-x:auto; padding-bottom:4px; }
+.col-t { background:var(--bande); border-radius:6px; padding:10px; min-width:0; }
+.col-t h3 { font-family:var(--texte); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:0 0 8px; display:flex; justify-content:space-between; }
+.carte { background:var(--feuille); border:1px solid var(--line); border-radius:6px; padding:9px 10px; margin:0 0 8px; font-size:14px; cursor:pointer; }
+.carte:hover { border-color:var(--ink); }
+.carte b { display:block; font-size:14.5px; } .carte small { color:var(--muted); }
+.tw { overflow-x:auto; }
+.zone table { font-size:14.5px; min-width:760px; }
+.zone td, .zone th { border-width:0 0 1px; padding:10px 12px; }
+.zone tbody tr { cursor:pointer; } .zone tbody tr:hover td { background:color-mix(in srgb, var(--surligne) 22%, var(--feuille)); }
+.barre-s { display:inline-grid; grid-template-columns:repeat(12, 7px); gap:2px; vertical-align:middle; }
+.barre-s i { height:10px; background:var(--line); border-radius:1px; } .barre-s i.f { background:var(--ink); }
+.filtres { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 14px; align-items:center; }
+.filtres input { max-width:280px; padding:9px 12px; font-size:15px; }
+.fiche-e { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; }
+.dl { display:grid; grid-template-columns:9em minmax(0,1fr); gap:6px 12px; margin:0; font-size:15px; } .dl dt { color:var(--muted); } .dl dd { margin:0; }
+.dom { display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-top:1px solid var(--line); font-size:15px; } .dom:first-of-type { border-top:0; }
+.fil { list-style:none; margin:0; padding:0; font-size:14.5px; } .fil li { padding:8px 0 8px 16px; border-left:2px solid var(--line); margin:0; } .fil small { color:var(--muted); display:block; }
+.roles { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; }
+.roles ul { padding-left:18px; margin:8px 0 12px; font-size:14.5px; } .roles li { margin-bottom:4px; }
+.jour { display:grid; grid-template-columns:5.5em minmax(0,1fr) auto; gap:12px; align-items:center; padding:10px 0; border-top:1px solid var(--line); font-size:15px; } .jour:first-of-type { border-top:0; }
+[hidden] { display:none !important; }
+.menu .mode { display:grid; grid-template-columns:1fr 1fr; gap:4px; background:rgba(255,255,255,.08); border-radius:8px; padding:4px; margin:0 0 14px; }
+.menu .mode button { justify-content:center; font-size:13px; padding:7px 6px; }
+.menu .mode button[aria-pressed="true"] { background:#FFFFFF; color:#17203A; }
+.reel .menu > button b { display:none; }
+.vide { text-align:center; padding:44px 20px; color:var(--muted); }
+.vide b { display:block; font-family:var(--titre); font-size:22px; color:var(--ink); margin-bottom:6px; }
+.form-l { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:0 16px; }
+.form-l label { font-size:14px; margin:12px 0 4px; } .form-l input, .form-l select { padding:9px 12px; font-size:15px; }
+.err-l { list-style:none; margin:0; padding:0; } .err-l li { padding:10px 0; border-top:1px solid var(--line); font-size:15px; margin:0; } .err-l li:first-child { border-top:0; }
+.err-l small { display:block; color:var(--muted); } .err-l b { color:var(--rouge); font-weight:600; }
+.etape2 { border-style:dashed; }
+@media (max-width:980px) { .menu .mode { flex:none; margin:0; } .form-l { grid-template-columns:minmax(0,1fr); } }
+@media (max-width:980px) { .cadre { grid-template-columns:minmax(0,1fr); } .menu { position:static; height:auto; flex-direction:row; flex-wrap:nowrap; overflow-x:auto; padding:10px; } .menu .sep, .menu .brand { display:none; } .menu button { width:auto; white-space:nowrap; } .zone { padding:20px 16px 56px; } .chiffres { grid-template-columns:repeat(2, minmax(0,1fr)); } .deux, .fiche-e, .roles { grid-template-columns:minmax(0,1fr); } }
+</style></head><body class="admin">
+<div class="maquette"><span>Maquette de l'outil d'administration. Toutes les données sont fictives, rien n'est enregistré.</span></div>
+<div class="cadre">
+<nav class="menu" aria-label="Administration">
+<a class="brand" href="index.html" aria-label="Lioris, retour au site"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14"/><path d="M19 15v34h20" fill="none" stroke-width="8" stroke-linecap="square"/><circle cx="48" cy="45" r="5.5" fill="#D7432E"/></svg><span>Lioris<b>.</b></span></a>
+<div class="mode" role="group" aria-label="Données affichées"><button type="button" id="m-demo" aria-pressed="true">Démonstration</button><button type="button" id="m-reel" aria-pressed="false">Réel</button></div>
+<button type="button" data-v="bord" aria-current="page">Tableau de bord <b>5</b></button>
+<p class="sep">Familles</p>
+<button type="button" data-v="eleves">Élèves et familles</button>
+<button type="button" data-v="tests">Tests et bilans <b>2</b></button>
+<button type="button" data-v="rdv">Rendez-vous</button>
+<p class="sep">Cours</p>
+<button type="button" data-v="seances">Séances</button>
+<button type="button" data-v="profs">Professeurs <b>1</b></button>
+<button type="button" data-v="rapports">Comptes rendus et rapports</button>
+<p class="sep">Gestion</p>
+<button type="button" data-v="paiements">Paiements <b>1</b></button>
+<button type="button" data-v="espaces">Espaces et accès</button>
+<button type="button" data-v="messages">Messages et relances</button>
+</nav>
+<main class="zone" id="zone"></main>
+</div>
+<script>
+(function(){
+// Donnees fictives : prenoms et situations inventes pour la maquette.
+var E=[
+ {n:'Inès B.',c:'Terminale',p:'Maths',prof:'Professeur A',s:4,etat:'Programme en cours',rdv:'jeu. 26 nov., 18 h',pay:'2 échéances sur 3',par:'Mme B.',tel:'à renseigner',alerte:''},
+ {n:'Hugo M.',c:'Quatrième',p:'Maths',prof:'Professeur B',s:9,etat:'Programme en cours',rdv:'mer. 25 nov., 14 h',pay:'Payé',par:'M. M.',tel:'à renseigner',alerte:'Proposition de suite à envoyer (semaine 10)'},
+ {n:'Yasmine K.',c:'Première',p:'Physique-chimie',prof:'Professeur C',s:1,etat:'Programme en cours',rdv:'ven. 27 nov., 17 h',pay:'1 échéance sur 3',par:'Mme K.',tel:'à renseigner',alerte:'Échéance du 20 nov. en retard'},
+ {n:'Théo R.',c:'Seconde',p:'Maths',prof:'à attribuer',s:0,etat:'Rendez-vous',rdv:'mar. 24 nov., 19 h',pay:'Rien',par:'Mme R.',tel:'à renseigner',alerte:''},
+ {n:'Lina S.',c:'Terminale',p:'Maths',prof:'à attribuer',s:0,etat:'Test passé',rdv:'aucun',pay:'Rien',par:'M. S.',tel:'à renseigner',alerte:'Test passé hier, aucun rendez-vous pris'},
+ {n:'Adam T.',c:'Prépa MPSI',p:'Maths',prof:'à attribuer',s:0,etat:'Inscrit',rdv:'lun. 30 nov., 18 h',pay:'Rien',par:'Mme T.',tel:'à renseigner',alerte:'Test pas encore passé, rendez-vous dans 6 jours'},
+ {n:'Sarah D.',c:'Cinquième',p:'Organisation et méthode',prof:'Coach A',s:12,etat:'Fin de trimestre',rdv:'terminé',pay:'Payé',par:'Mme D.',tel:'à renseigner',alerte:''}
+];
+var ETATS=['Inscrit','Test passé','Rendez-vous','Programme en cours','Fin de trimestre'];
+function h(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+function sem(n){var o='<span class="barre-s" aria-label="Semaine '+n+' sur 12">';for(var i=1;i<=12;i++)o+='<i'+(i<=n?' class="f"':'')+'></i>';return o+'</span>';}
+function tag(t,k){return '<span class="tag '+k+'">'+t+'</span>';}
+var V={};
+V.bord=function(){
+ var o='<h1>Tableau de bord</h1><p class="sous-titre">Dimanche 22 novembre. Ce qui demande votre attention, puis tout le reste.</p>';
+ o+='<div class="chiffres"><div class="bloc"><b>7</b><span>familles suivies</span></div><div class="bloc"><b>3</b><span>programmes en cours</span></div><div class="bloc"><b>4</b><span>rendez-vous et séances cette semaine</span></div><div class="bloc"><b>1</b><span>échéance en retard</span></div></div>';
+ o+='<div class="deux"><div class="bloc"><h2>À faire</h2><ul class="afaire">';
+ [['','Lina S. a passé son test hier','Aucun rendez-vous pris. Règle : rappel sous 24 heures.','Proposer un créneau'],['','Yasmine K., échéance du 20 novembre en retard','2e échéance sur 3, 240 €.','Relancer'],['j','Professeur B : compte rendu du 18 novembre non rendu','Séance de Hugo M.','Rappeler'],['j','Hugo M. entre en semaine 10','Le professeur doit dire par écrit s\'il conseille de continuer.','Préparer'],['j','Adam T. n\'a pas passé son test','Rendez-vous dans 6 jours.','Renvoyer le lien']].forEach(function(x){o+='<li><span class="pt '+x[0]+'"></span><span>'+x[1]+'<small>'+x[2]+'</small></span><button type="button" class="act">'+x[3]+'</button></li>';});
+ o+='</ul></div><div class="bloc"><h2>Aujourd\'hui et demain</h2>';
+ [['mar. 19 h','Rendez-vous de résultats, Théo R.','à attribuer'],['mer. 14 h','Séance 9, Hugo M.','Professeur B'],['jeu. 18 h','Séance 8, Inès B.','Professeur A'],['ven. 17 h','Séance 2, Yasmine K.','Professeur C']].forEach(function(x){o+='<div class="jour"><b>'+x[0]+'</b><span>'+x[1]+'</span><small>'+x[2]+'</small></div>';});
+ o+='</div></div><div class="bloc"><h2>Où en est chaque famille</h2><div class="tuyau">';
+ ETATS.forEach(function(et){var l=E.filter(function(e){return e.etat===et;});o+='<div class="col-t"><h3><span>'+et+'</span><span>'+l.length+'</span></h3>'+l.map(function(e){return '<div class="carte" data-e="'+E.indexOf(e)+'"><b>'+h(e.n)+'</b><small>'+h(e.c)+' · '+h(e.p)+'</small></div>';}).join('')+'</div>';});
+ return o+'</div></div>';
+};
+V.eleves=function(){
+ var o='<h1>Élèves et familles</h1><p class="sous-titre">Une ligne par élève. Un clic ouvre sa fiche complète.</p><div class="filtres"><input type="text" id="cherche" placeholder="Chercher un élève, un parent" aria-label="Chercher"><button type="button" class="act plein">Ajouter une famille</button></div>';
+ o+='<div class="bloc tw"><table><thead><tr><th>Élève</th><th>Classe</th><th>Programme</th><th>Professeur</th><th>Avancement</th><th>Prochain rendez-vous</th><th>Paiement</th></tr></thead><tbody>';
+ E.forEach(function(e,i){o+='<tr data-e="'+i+'"><td><b>'+h(e.n)+'</b></td><td>'+h(e.c)+'</td><td>'+h(e.p)+'</td><td>'+h(e.prof)+'</td><td>'+(e.s?sem(e.s)+' '+e.s+'/12':h(e.etat))+'</td><td>'+h(e.rdv)+'</td><td>'+h(e.pay)+'</td></tr>';});
+ return o+'</tbody></table></div>';
+};
+V.fiche=function(i){var e=E[i];
+ var o='<p><button type="button" class="act" data-v="eleves">Retour à la liste</button></p><h1>'+h(e.n)+'</h1><p class="sous-titre">'+h(e.c)+' · '+h(e.p)+' · '+h(e.etat)+(e.alerte?' · '+tag(h(e.alerte),'be'):'')+'</p>';
+ o+='<div class="fiche-e"><div><div class="bloc"><h2>Famille</h2><dl class="dl"><dt>Parent</dt><dd>'+h(e.par)+'</dd><dt>Téléphone</dt><dd>'+h(e.tel)+'</dd><dt>Email</dt><dd>à renseigner</dd><dt>Accord parental</dt><dd>donné à l\'inscription</dd><dt>Espace parent</dt><dd>'+(e.s?'ouvert':'pas encore créé')+' <button type="button" class="act">'+(e.s?'Voir comme le parent':'Créer l\'espace')+'</button></dd></dl></div>';
+ o+='<div class="bloc"><h2>Résultat du test</h2><div class="dom"><span>Calcul</span>'+tag('satisfaisant','ok')+'</div><div class="dom"><span>Équations et inéquations</span>'+tag('fragile','fr')+'</div><div class="dom"><span>Dérivation</span>'+tag('à besoins','be')+'</div><div class="dom"><span>Rédaction</span>'+tag('fragile','fr')+'</div><p class="small" style="margin:12px 0 0">Erreurs nommées : divise par x et perd une solution ; erreur de signe en factorisant. <a href="prof.html?pack=maths-premiere-terminale">Voir toutes les réponses</a></p></div>';
+ o+='<div class="bloc"><h2>Paiement</h2><dl class="dl"><dt>Programme</dt><dd>960 €, en trois fois</dd><dt>État</dt><dd>'+h(e.pay)+'</dd><dt>Prochaine échéance</dt><dd>20 décembre, 320 €</dd></dl></div></div>';
+ o+='<div><div class="bloc"><h2>Plan du trimestre</h2><p>'+sem(e.s)+' semaine '+e.s+' sur 12 · '+h(e.prof)+'</p><div class="dom"><span>1. Calcul et équations</span>'+tag('acquis','ok')+'</div><div class="dom"><span>2. Dérivation : règles de calcul</span>'+tag('acquis','ok')+'</div><div class="dom"><span>3. Étude de fonctions</span>'+tag('en cours','fr')+'</div><div class="dom"><span>4. Rédaction et justification</span>'+tag('à renforcer','be')+'</div><div class="dom"><span>5 à 7. Suites, probabilités, épreuves</span>'+tag('pas commencé','na')+'</div></div>';
+ o+='<div class="bloc"><h2>Journal</h2><ul class="fil"><li>Rapport de la semaine 4 envoyé au parent<small>21 nov., automatique</small></li><li>Séance 7 faite, compte rendu rendu<small>19 nov., '+h(e.prof)+'</small></li><li>Message WhatsApp du parent : changement de créneau<small>17 nov., traité</small></li><li>2e échéance encaissée<small>15 nov.</small></li><li>Rendez-vous de résultats, écrit remis<small>26 oct.</small></li><li>Test passé<small>25 oct.</small></li></ul></div></div></div>';
+ return o;
+};
+V.tests=function(){var o='<h1>Tests et bilans</h1><p class="sous-titre">Chaque test passé arrive ici, avec les erreurs nommées. Le professeur le reçoit avant le rendez-vous.</p><div class="bloc tw"><table><thead><tr><th>Élève</th><th>Test</th><th>Passé le</th><th>Ce qui ressort</th><th>Rendez-vous</th><th></th></tr></thead><tbody>';
+ [['Lina S.','Maths, terminale','21 nov.',tag('1 à besoins','be')+' '+tag('2 fragiles','fr'),tag('à prendre','be')],['Théo R.','Maths, seconde','20 nov.',tag('3 fragiles','fr'),'mar. 24 nov.'],['Adam T.','Maths, prépa','pas encore',tag('en attente','na'),'lun. 30 nov.'],['Yasmine K.','Physique-chimie, première','12 nov.',tag('2 à besoins','be'),'fait']].forEach(function(x){o+='<tr><td><b>'+x[0]+'</b></td><td>'+x[1]+'</td><td>'+x[2]+'</td><td>'+x[3]+'</td><td>'+x[4]+'</td><td><button type="button" class="act">Ouvrir</button></td></tr>';});
+ return o+'</tbody></table></div>';};
+V.rdv=function(){return '<h1>Rendez-vous</h1><p class="sous-titre">Les rendez-vous de résultats, pris par le parent à l\'inscription.</p><div class="bloc"><div class="jour"><b>mar. 24, 19 h</b><span>Théo R., maths seconde. Test passé, résultat prêt.</span><button type="button" class="act">Attribuer un professeur</button></div><div class="jour"><b>lun. 30, 18 h</b><span>Adam T., maths prépa. Test pas encore passé.</span><button type="button" class="act">Renvoyer le lien</button></div><div class="jour"><b>à prendre</b><span>Lina S., maths terminale. Test passé le 21 novembre.</span><button type="button" class="act plein">Proposer un créneau</button></div></div>';};
+V.seances=function(){var o='<h1>Séances</h1><p class="sous-titre">La semaine du 23 novembre. Si un élève ne se connecte pas, le parent est prévenu dans les 10 minutes.</p><div class="bloc">';
+ [['mer. 14 h','Hugo M.','Professeur B','Séance 9 sur 12','prévue'],['jeu. 18 h','Inès B.','Professeur A','Séance 8 sur 24','prévue'],['ven. 17 h','Yasmine K.','Professeur C','Séance 2 sur 12','prévue'],['mer. 18 nov.','Hugo M.','Professeur B','Séance 8','compte rendu manquant']].forEach(function(x){o+='<div class="jour"><b>'+x[0]+'</b><span>'+x[1]+' · '+x[2]+' · '+x[3]+'</span>'+tag(x[4],x[4]==='prévue'?'na':'be')+'</div>';});
+ return o+'</div>';};
+V.profs=function(){var o='<h1>Professeurs</h1><p class="sous-titre">Qui suit qui, et ce qui est en retard.</p><div class="bloc tw"><table><thead><tr><th>Professeur</th><th>Matières</th><th>Élèves</th><th>Séances cette semaine</th><th>Comptes rendus</th><th></th></tr></thead><tbody>';
+ [['Professeur A','Maths, lycée','1','1',tag('à jour','ok')],['Professeur B','Maths, collège et seconde','1','1',tag('1 en retard','be')],['Professeur C','Physique-chimie','1','1',tag('à jour','ok')],['Coach A','Organisation et méthode','0','0',tag('à jour','ok')]].forEach(function(x){o+='<tr><td><b>'+x[0]+'</b></td><td>'+x[1]+'</td><td>'+x[2]+'</td><td>'+x[3]+'</td><td>'+x[4]+'</td><td><button type="button" class="act">Voir comme lui</button></td></tr>';});
+ return o+'</tbody></table></div><p><button type="button" class="act plein">Inviter un professeur</button></p>';};
+V.rapports=function(){return '<h1>Comptes rendus et rapports</h1><p class="sous-titre">Le professeur écrit le compte rendu après chaque séance. Le rapport de la semaine part au parent le samedi.</p><div class="bloc"><div class="jour"><b>sam. 21 nov.</b><span>Rapport de la semaine 4, Inès B.</span>'+tag('envoyé','ok')+'</div><div class="jour"><b>sam. 21 nov.</b><span>Rapport de la semaine 9, Hugo M.</span>'+tag('en attente du compte rendu','be')+'</div><div class="jour"><b>jeu. 19 nov.</b><span>Compte rendu de la séance 7, Inès B.</span>'+tag('rendu','ok')+'</div></div>';};
+V.paiements=function(){var o='<h1>Paiements</h1><p class="sous-titre">Un programme se paie en une fois ou en trois fois sans frais.</p><div class="chiffres"><div class="bloc"><b>2 110 €</b><span>encaissés ce trimestre</span></div><div class="bloc"><b>560 €</b><span>échéances à venir</span></div><div class="bloc"><b>240 €</b><span>en retard</span></div><div class="bloc"><b>0 €</b><span>remboursés</span></div></div><div class="bloc tw"><table><thead><tr><th>Famille</th><th>Programme</th><th>Total</th><th>Encaissé</th><th>Prochaine échéance</th><th>État</th></tr></thead><tbody>';
+ [['Inès B.','Maths, terminale','960 €','640 €','20 déc., 320 €',tag('à jour','ok')],['Hugo M.','Maths, collège','630 €','630 €','aucune',tag('payé','ok')],['Yasmine K.','Physique-chimie','720 €','240 €','20 nov., 240 €',tag('en retard','be')],['Sarah D.','Organisation et méthode','600 €','600 €','aucune',tag('payé','ok')]].forEach(function(x){o+='<tr><td><b>'+x[0]+'</b></td><td>'+x[1]+'</td><td>'+x[2]+'</td><td>'+x[3]+'</td><td>'+x[4]+'</td><td>'+x[5]+'</td></tr>';});
+ return o+'</tbody></table></div>';};
+V.espaces=function(){return '<h1>Espaces et accès</h1><p class="sous-titre">Vous créez un espace en un clic. Chacun ne voit que ce qui le concerne.</p><div class="roles"><div class="bloc"><h2>Parent</h2><ul><li>Le résultat du test et l\'écrit</li><li>Le plan et l\'avancement</li><li>Les comptes rendus et les rapports</li><li>Les rendez-vous, les paiements</li></ul><button type="button" class="act plein">Créer un espace parent</button></div><div class="bloc"><h2>Élève</h2><ul><li>Son test, ses séances à venir</li><li>Le travail à faire et à rendre</li><li>Ses exercices corrigés</li><li>Rien sur les paiements</li></ul><button type="button" class="act plein">Créer un espace élève</button></div><div class="bloc"><h2>Professeur</h2><ul><li>Ses élèves seulement</li><li>Les réponses au test avant le rendez-vous</li><li>Le compte rendu à écrire après la séance</li><li>Aucun prix, aucun contact d\'une autre famille</li></ul><button type="button" class="act plein">Inviter un professeur</button></div></div><div class="bloc"><h2>Accès ouverts</h2><div class="jour"><b>Parent</b><span>Mme B. (Inès B.) · dernière visite hier</span><button type="button" class="act">Voir comme elle</button></div><div class="jour"><b>Professeur</b><span>Professeur A · 1 élève</span><button type="button" class="act">Suspendre</button></div></div>';};
+V.messages=function(){return '<h1>Messages et relances</h1><p class="sous-titre">Les messages qui partent seuls, et ceux que vous envoyez. WhatsApp ouvert de 9 h à 18 h.</p><div class="bloc"><h2>Automatiques</h2><div class="jour"><b>Inscription</b><span>Lien du test et rappel du rendez-vous</span>'+tag('actif','ok')+'</div><div class="jour"><b>Test non passé</b><span>Rappel la veille du rendez-vous</span>'+tag('actif','ok')+'</div><div class="jour"><b>Élève absent</b><span>Message au parent à la 5e minute, puis appel d\'une personne</span>'+tag('actif','ok')+'</div><div class="jour"><b>Samedi</b><span>Rapport de la semaine au parent</span>'+tag('actif','ok')+'</div><div class="jour"><b>Semaine 10</b><span>Proposition écrite de suite, préparée par le professeur</span>'+tag('à valider par vous','fr')+'</div></div>';};
+var z=document.getElementById('zone'),b=document.querySelectorAll('.menu button');
+function va(v,arg){z.innerHTML=V[v](arg);Array.prototype.forEach.call(b,function(x){if(x.getAttribute('data-v')===(v==='fiche'?'eleves':v))x.setAttribute('aria-current','page');else x.removeAttribute('aria-current');});window.scrollTo(0,0);}
+document.addEventListener('click',function(ev){var t=ev.target.closest('[data-e]');if(t){va('fiche',+t.getAttribute('data-e'));return;}t=ev.target.closest('[data-v]');if(t)va(t.getAttribute('data-v'));});
+document.addEventListener('input',function(ev){if(ev.target.id!=='cherche')return;var q=ev.target.value.toLowerCase();Array.prototype.forEach.call(z.querySelectorAll('tbody tr'),function(r){r.hidden=r.textContent.toLowerCase().indexOf(q)<0;});});
+window.ADMIN={V:V,va:va,E:E,sem:sem,tag:tag,h:h,z:z};
+va('bord');
+})();
+</script>
+<script src="data/diag-anglais.js"></script><script src="data/diag-chimie-prepa.js"></script><script src="data/diag-chimie-superieur.js"></script><script src="data/diag-francais.js"></script><script src="data/diag-histoire-geographie.js"></script><script src="data/diag-maths-college-seconde.js"></script><script src="data/diag-maths-premiere-terminale.js"></script><script src="data/diag-maths-prepa.js"></script><script src="data/diag-maths-superieur.js"></script><script src="data/diag-philosophie.js"></script><script src="data/diag-physique-chimie-college-seconde.js"></script><script src="data/diag-physique-chimie.js"></script><script src="data/diag-physique-prepa.js"></script><script src="data/diag-physique-superieur.js"></script><script src="data/diag-ses.js"></script><script src="data/diag-svt-prepa.js"></script><script src="data/diag-svt.js"></script>
+<script src="lio-config.js"></script><script src="lio-crm.js"></script>
+<script src="admin-reel.js"></script>
+</body></html>
