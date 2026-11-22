@@ -136,3 +136,39 @@ details.texte p { font-size:16.5px; line-height:1.6; padding:0 0 12px; }
 @media (max-width:759px) { nav.top .lien-nav { font-size:15px; } .scene.b { padding:0; } .scene.b .feuille { margin:-48px 0 0 0; width:auto; left:auto; } nav.top .wrap { gap:16px; } }
 
 .interne .hero h1.long { font-size:clamp(30px, 3.5vw, 46px); line-height:1.08; }
+
+/* ----- page Programmes et tarifs (2026-11-22) : onglets de classe, cartes, suivi mis en avant */
+.niveaux { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 40px; }
+.niveaux button { font:inherit; font-family:var(--titre); font-weight:700; font-size:18px; letter-spacing:-.01em; padding:11px 20px; border:1.5px solid var(--ink); border-radius:99px; background:transparent; color:var(--ink); cursor:pointer; transition:background .12s ease, color .12s ease; }
+.niveaux button:hover { background:color-mix(in srgb, var(--surligne) 55%, transparent); }
+.niveaux button[aria-selected="true"] { background:var(--ink); color:var(--bg); }
+html:not(.onglets) .niveaux { display:none; }
+.panneau { max-width:none !important; }
+.panneau + .panneau { margin-top:64px; }
+.onglets .panneau + .panneau { margin-top:0; }
+.cartes { display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:16px; margin:24px 0 0; }
+.carte-p { display:grid; grid-template-rows:auto 1fr auto auto auto; gap:4px; padding:22px 22px 18px; background:var(--feuille); color:#17203A; border:1px solid var(--line); border-radius:8px; text-decoration:none; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+.carte-p:hover { transform:translateY(-3px); border-color:#17203A; box-shadow:0 18px 36px -22px rgba(23,32,58,.5); }
+.carte-p strong { font-family:var(--titre); font-weight:700; font-size:24px; line-height:1.1; letter-spacing:-.02em; }
+.carte-p .det { font-size:15px; line-height:1.4; color:#4A5370; padding-bottom:18px; }
+.carte-p .px { font-family:var(--titre); font-weight:700; font-size:38px; line-height:1; letter-spacing:-.03em; font-variant-numeric:tabular-nums; }
+.carte-p .ech { font-size:14px; color:#4A5370; }
+.carte-p .todo { justify-self:start; margin-top:6px; font-size:12.5px; }
+.carte-p .voir { margin-top:14px; padding-top:12px; border-top:1px solid var(--line); font-weight:700; font-size:15px; color:var(--cta); }
+.carte-p .voir::after { content:"  \2192"; }
+.carte-p.deux { background:var(--bande); }
+.col > .niveaux { max-width:none; }
+.interne .hero.simple { padding-bottom:24px; }
+.interne main > section#prix { padding-top:48px; }
+.suivi { background:var(--sombre) !important; color:var(--sombre-ink); }
+.suivi .hl { color:#17203A; background-image:linear-gradient(var(--surligne), var(--surligne)); padding:0 .14em; }
+.suivi .small { color:var(--sombre-muted); }
+.duo-suivi { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr); gap:56px; align-items:center; max-width:none !important; margin-top:40px; }
+.tuiles { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:0 36px; }
+.tuiles li { padding:18px 0; border-top:1px solid rgba(255,255,255,.22); margin:0; display:grid; gap:4px; }
+.tuiles b { font-family:var(--titre); font-weight:700; font-size:20px; letter-spacing:-.015em; }
+.tuiles span { font-size:16px; color:var(--sombre-muted); }
+.tuiles .todo { color:#17203A; }
+.suivi .fiche { margin:0; }
+@media (max-width:1020px) { .duo-suivi { grid-template-columns:minmax(0,1fr); gap:36px; } }
+@media (max-width:759px) { .tuiles { grid-template-columns:minmax(0,1fr); } .niveaux button { font-size:16px; padding:9px 15px; } .carte-p .px { font-size:32px; } }

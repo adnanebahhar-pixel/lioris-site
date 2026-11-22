@@ -9,7 +9,7 @@ function accueil(){
  var avecRed=Object.keys(D.blocs).some(function(k){return D.blocs[k].redaction;});
  app.innerHTML='<p class="brand">Lioris</p><h1>'+esc(D.titre)+'</h1>'+
  '<p class="lead">'+(ins.eleve?esc(ins.eleve)+', ce':'Ce')+' test sert à repérer ce qu\'il faut travailler. Ce n\'est pas une note.</p>'+
- '<ul><li>Des questions à choix'+(avecRed?', puis un court exercice à rédiger sur papier':'')+'.</li><li>Environ '+esc(D.duree)+'. '+esc(D.calculatrice)+'</li><li>Calcule au brouillon avant de répondre.</li><li>Ne réponds pas au hasard. « Je ne sais pas » nous aide plus qu\'un coup de chance.</li><li>Tes réponses seront expliquées à ton parent par un professeur.</li></ul>'+
+ '<ul><li>Des questions à choix'+(avecRed?', puis un court exercice à rédiger sur papier':'')+'.</li><li>Environ '+esc(D.duree)+'. '+esc(D.calculatrice)+'</li><li>Calcule au brouillon avant de répondre.</li><li>Ne réponds pas au hasard. « Je ne sais pas » nous aide plus qu\'un coup de chance.</li><li>'+(ins.qui==='moi'?'Un professeur t\'expliquera tes réponses pendant le rendez-vous.':'Tes réponses seront expliquées à ton parent par un professeur.')+'</li></ul>'+
  (niveau?'':'<label for="nv">Ta classe</label><select id="nv">'+D.classes.map(function(c){return '<option value="'+c[1]+'">'+esc(c[0])+'</option>';}).join('')+'</select>')+
  '<button class="btn" id="go">Commencer</button>';
  document.getElementById('go').onclick=function(){if(!niveau)niveau=document.getElementById('nv').value;
@@ -48,7 +48,13 @@ function redaction(){
 }
 function fin(photo){
  var RES={pack:window.PACK,niveau:niveau,eleve:ins.eleve||'',parent:ins.parent||'',duree:Math.round((Date.now()-debut)/1000),reponses:rep,redaction:aRedaction(),photo:photo,fin:new Date().toISOString()};L.ecrire('lioris_resultat',RES);if(window.CRM)window.CRM.resultat(RES);
- app.innerHTML='<p class="brand">Lioris</p><h1>C\'est terminé, merci.</h1><p class="lead">Un professeur regarde tes réponses et les explique à ton parent pendant le rendez-vous. Ton parent reçoit un email avec la date et l\'heure.</p><p class="note">Tu n\'as pas de note : le test sert à savoir quoi travailler.</p>';
+ var file=[];try{file=JSON.parse(sessionStorage.getItem('lioris_file')||'[]');}catch(e){}
+ var suivant=file.shift(),moi=ins.qui==='moi';try{sessionStorage.setItem('lioris_file',JSON.stringify(file));}catch(e){}
+ var lien=suivant?(suivant==='bilan'?'bilan.html?qui='+(moi?'eleve':'parent'):'test.html?pack='+suivant):'';
+ app.innerHTML='<p class="brand">Lioris</p><h1>'+(suivant?'Ce test est terminé.':'C\'est terminé, merci.')+'</h1>'+
+  (suivant?'<p class="lead">Il te reste '+(file.length+1)+' étape'+(file.length?'s':'')+'. Tu peux faire une pause avant de continuer.</p><p><a class="btn" href="'+lien+'">'+(suivant==='bilan'?'Passer au bilan d\'organisation':'Passer au test suivant : '+esc(window.DIAGS[suivant]?window.DIAGS[suivant].titre:suivant))+'</a></p>'
+   :'<p class="lead">'+(moi?'Un professeur regarde tes réponses et te les explique pendant le rendez-vous. Tu reçois un email avec la date et l\'heure.':'Un professeur regarde tes réponses et les explique à ton parent pendant le rendez-vous. Ton parent reçoit un email avec la date et l\'heure.')+'</p>')+
+  '<p class="note">Tu n\'as pas de note : le test sert à savoir quoi travailler.</p>';
  window.scrollTo(0,0);
 }
 accueil();

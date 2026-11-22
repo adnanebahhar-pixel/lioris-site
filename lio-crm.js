@@ -15,14 +15,16 @@
   familles:function(){return lire().f;},
   famille:function(id){return trouve(lire(),id);},
   // Inscription d'un parent : cree la fiche. Renvoie son identifiant.
-  inscription:function(o){var b=lire(),f={id:'f'+Date.now()+Math.floor(Math.random()*1000),parent:o.parent||'',email:o.email||'',tel:o.tel||'',eleve:o.eleve||'',classe:o.classe||'',niveau:o.niveau||'',pack:o.pack||'',programme:o.programme||'',creneau:o.creneau||'',contact:!!o.contact,accord:o.accord!==false,cree:new Date().toISOString(),etat:'Inscrit',prof:'',rdv:'',test:null,journal:[]};
-   note(f,'Inscription'+(o.origine?' ('+o.origine+')':''));b.f.unshift(f);ecrire(b);try{sessionStorage.setItem('lioris_crm_id',f.id);}catch(e){}
-   // Envoi a la base en ligne. Le jeton recu servira a deposer le test. CRM.attente : la page attend sa fin avant de changer d'adresse.
-   var id=f.id;window.CRM.attente=rpc('inscrire',{p_parent:f.parent,p_email:f.email,p_telephone:f.tel,p_eleve:f.eleve,p_classe:f.classe,p_cle:f.pack,p_accord:f.accord,p_contact:f.contact}).then(function(j){if(j)window.CRM.maj(id,{jeton:j},'Fiche envoyée à la base en ligne');return j;}).catch(function(e){window.CRM.noter(id,'Envoi à la base en ligne refusé : '+e.message);return null;});
-   return f.id;},
+  // o.packs : la liste des tests choisis (un seul le plus souvent). Une fiche locale par test ; en ligne, une seule famille et un lien de test par matiere.
+  inscription:function(o){var b=lire(),packs=o.packs||[o.pack],ids=[],T=window.DIAGS||{};
+   packs.forEach(function(k,n){var f={id:'f'+Date.now()+n+Math.floor(Math.random()*1000),parent:o.parent||'',email:o.email||'',tel:o.tel||'',eleve:o.eleve||'',classe:o.classe||'',niveau:o.niveau||'',pack:k||'',programme:(T[k]&&T[k].titre)||o.programme||'',creneau:o.creneau||'',contact:!!o.contact,accord:o.accord!==false,qui:o.qui||'enfant',cree:new Date().toISOString(),etat:'Inscrit',prof:'',rdv:'',test:null,journal:[]};
+    note(f,'Inscription'+(o.origine?' ('+o.origine+')':'')+(packs.length>1?', '+packs.length+' tests choisis':''));b.f.unshift(f);ids.push(f.id);});
+   ecrire(b);try{sessionStorage.setItem('lioris_crm_id',ids[0]);}catch(e){}
+   window.CRM.attente=rpc('inscrire_plusieurs',{p_parent:o.parent||'',p_email:o.email||'',p_telephone:o.tel||'',p_eleve:o.eleve||'',p_classe:o.classe||'',p_cles:packs,p_accord:o.accord!==false,p_contact:!!o.contact,p_pour_soi:o.qui==='moi'}).then(function(j){if(j)ids.forEach(function(id,n){window.CRM.maj(id,{jeton:j[packs[n]]},'Fiche envoyée à la base en ligne');});return j;}).catch(function(e){window.CRM.noter(ids[0],'Envoi à la base en ligne refusé : '+e.message);return null;});
+   return ids[0];},
   // Test termine : rattache le resultat a la fiche ouverte dans cette session, sinon a la derniere fiche du meme test sans resultat.
   resultat:function(r){var b=lire(),id=null,f;try{id=sessionStorage.getItem('lioris_crm_id');}catch(e){}
-   f=(id&&trouve(b,id))||b.f.filter(function(x){return x.pack===r.pack&&!x.test;})[0];
+   f=b.f.filter(function(x){return x.pack===r.pack&&!x.test;})[0]||(id&&trouve(b,id));
    if(!f){f={id:'f'+Date.now(),parent:r.parent||'',email:'',tel:'',eleve:r.eleve||'Élève sans inscription',classe:'',niveau:r.niveau||'',pack:r.pack,programme:'',creneau:'',contact:false,accord:false,cree:new Date().toISOString(),etat:'Inscrit',prof:'',rdv:'',test:null,journal:[]};note(f,'Fiche créée par un test passé sans inscription');b.f.unshift(f);}
    f.test=r;if(f.etat==='Inscrit')f.etat='Test passé';note(f,'Test passé');ecrire(b);
    var id2=f.id;if(f.jeton)rpc('deposer_test',{p_jeton:f.jeton,p_niveau:r.niveau||'',p_reponses:r.reponses||{},p_redaction:!!r.redaction,p_duree_s:r.duree||0}).then(function(){window.CRM.noter(id2,'Test envoyé à la base en ligne');}).catch(function(e){window.CRM.noter(id2,'Envoi du test refusé : '+e.message);});
