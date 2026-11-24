@@ -21,7 +21,7 @@ function inscription(){
   try{localStorage.setItem('lioris_bilan_inscription',JSON.stringify(ins));}catch(x){} accueil();};
 }
 function accueil(){
- app.innerHTML='<p class="brand">Lioris</p><h1>Bilan d\'organisation</h1><p class="lead">'+esc(B.accueil[qui])+'</p><p class="small"><span class="todo">Ligne d\'information sur les données : à écrire avec le juriste.</span></p><button class="btn" id="go">Commencer</button>';
+ app.innerHTML='<p class="brand">Lioris</p><h1>Bilan d\'organisation</h1><p class="lead">'+esc(B.accueil[qui])+'</p><p class="small"></p><button class="btn" id="go">Commencer</button>';
  window.scrollTo(0,0);document.getElementById('go').onclick=function(){i=0;affirmation();};
 }
 function affirmation(){
@@ -41,7 +41,7 @@ function ouvertes(){
  h+='<p class="small">Merci de ne pas indiquer ici d\'information de santé.</p>';
  if(qui==='parent'){h+='<h3>Facultatif</h3><p>Souhaitez-vous nous signaler quelque chose pour adapter l\'accompagnement ? Vous restez libre de ne rien cocher : le bilan a lieu dans tous les cas.</p>';
   B.cases.forEach(function(c,k){h+='<label class="check"><input type="checkbox" class="cf" id="cf'+k+'"><span>'+esc(c)+'</span></label>';});
-  h+='<div id="cons" hidden><label class="check"><input type="checkbox" id="cs"><span>'+esc(B.consentement)+' <span class="todo">Mentions sur les données à ajouter avec le juriste.</span></span></label></div>';}
+  h+='<div id="cons" hidden><label class="check"><input type="checkbox" id="cs"><span>'+esc(B.consentement)+'</span></label></div>';}
  h+='<button class="btn" type="submit">Terminer</button><p id="msg" class="note" hidden></p></form>';
  app.innerHTML=h;window.scrollTo(0,0);
  var cfs=app.querySelectorAll('.cf');
@@ -56,7 +56,7 @@ function ouvertes(){
 }
 function fin(){
  app.innerHTML=qui==='parent'
-  ?'<p class="brand">Lioris</p><h1>Merci, votre bilan est enregistré.</h1><p class="lead">Il reste celui de votre enfant : cinq minutes, de son côté, sans vous.</p><p class="note">Vous recevez par email le lien à lui transmettre. <span class="todo">email à brancher</span></p>'
+  ?'<p class="brand">Lioris</p><h1>Merci, votre bilan est enregistré.</h1><p class="lead">Il reste celui de votre enfant : cinq minutes, de son côté, sans vous.</p><p class="note">Vous recevez par email le lien à lui transmettre.</p>'
   :'<p class="brand">Lioris</p><h1>C\'est terminé, merci.</h1><p class="lead">Le coach lit tes réponses. On en parle ensemble, avec ton parent, pendant l\'échange.</p><p class="note">Il n\'y a pas de note et pas de bonne réponse.</p>';
  window.scrollTo(0,0);
 }
