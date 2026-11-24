@@ -1,13 +1,13 @@
 // Inscription du parent au diagnostic, squelette. Le diagnostic vient de ?pack=...
 (function(){
 var D=window.DIAG, L=window.LIO, app=document.getElementById('app');
-var Q=location.search,MOI=/[?&]qui=moi/.test(Q),SUITE=((Q.match(/[?&]suite=([\w,-]+)/)||[])[1]||'').split(',').filter(function(k){return k&&window.DIAGS[k]&&k!==window.PACK;}),ORGA=/[?&]orga=1/.test(Q);
+var Q=location.search,MOI=/[?&]qui=moi/.test(Q),SUITE=((Q.match(/[?&]suite=([\w,-]+)/)||[])[1]||'').split(',').filter(function(k){return k&&window.DIAGS[k]&&k!==window.PACK;});
 var PACKS=[window.PACK].concat(SUITE),NOMS=PACKS.map(function(k){return window.DIAGS[k].titre;});
 var plusieurs=PACKS.length>1,dureeTxt=plusieurs?'un par matière':'environ '+L.esc(D.duree);
 var h='<p class="brand">Lioris</p><h1>'+(plusieurs?'Vos '+PACKS.length+' tests':L.esc(D.titre))+' : gratuit</h1>'+
- (plusieurs?'<p class="note">'+NOMS.map(L.esc).join(' · ')+(ORGA?' · puis le bilan d\'organisation':'')+'</p>':'')+
- '<p class="lead">'+(MOI?'Vous passez '+(plusieurs?'les tests, ':'le test, ')+dureeTxt+'. Un professeur vous présente les résultats en visio et, si c\'est utile, un programme. Vous êtes libre de ne pas donner suite.'
-   :'Vous inscrivez votre enfant. Il passe '+(plusieurs?'les tests, ':'le test, ')+dureeTxt+'. Un professeur vous présente les résultats en visio et, si c\'est utile, un programme. Vous êtes libre de ne pas donner suite.')+'</p>'+
+ (plusieurs?'<p class="note">'+NOMS.map(L.esc).join(' · ')+'</p>':'')+
+ '<p class="lead">'+(MOI?'Vous passez '+(plusieurs?'les tests, ':'le test, ')+dureeTxt+'. Vous recevez la carte des erreurs par écrit. Un professeur vous l\'explique en visio et, si c\'est utile, vous propose un programme. Vous êtes libre de ne pas donner suite.'
+   :'Vous inscrivez votre enfant. Il passe '+(plusieurs?'les tests, ':'le test, ')+dureeTxt+'. Vous recevez la carte des erreurs par écrit. Un professeur vous l\'explique en visio et, si c\'est utile, vous propose un programme. Vous êtes libre de ne pas donner suite.')+'</p>'+
  '<form id="f"><label for="pp">Votre prénom</label><input id="pp" type="text" required autocomplete="given-name">'+
  '<label for="em">Votre email</label><input id="em" type="email" required autocomplete="email">'+
  '<label for="tel">Votre téléphone</label><input id="tel" type="tel" autocomplete="tel">'+
@@ -25,7 +25,7 @@ document.getElementById('f').addEventListener('submit',function(e){e.preventDefa
  // Une fiche d'inscription par test, pour que chaque test retrouve le prenom et la classe. Le code de niveau depend du test : on le retrouve par le nom de la classe.
  PACKS.forEach(function(k){var G=window.DIAGS[k],mot=classe.split(/[ ,]/)[0],c=(k===window.PACK)?[classe,v('cl')]:(G.classes.filter(function(x){return x[0].split(/[ ,]/)[0]===mot;})[0]||[classe,null]);
   try{localStorage.setItem('lioris_inscription_'+k,JSON.stringify({parent:v('pp'),email:v('em'),tel:v('tel'),eleve:eleve,niveau:c[1],classe:classe,creneau:CRENEAU,contact:true,qui:MOI?'moi':'enfant',date:new Date().toISOString()}));}catch(e){}});
- try{sessionStorage.setItem('lioris_file',JSON.stringify(SUITE.concat(ORGA?['bilan']:[])));}catch(e){}
+ try{sessionStorage.setItem('lioris_file',JSON.stringify(SUITE));}catch(e){}
  if(window.CRM)window.CRM.inscription({parent:v('pp'),email:v('em'),tel:v('tel'),eleve:eleve,niveau:v('cl'),classe:classe,creneau:CRENEAU,contact:true,accord:document.getElementById('c1').checked,packs:PACKS,qui:MOI?'moi':'enfant',origine:'site'});
  // Etape 2 : le creneau du rendez-vous, choisi dans l'agenda Cal.com (rien n'est passe dans l'adresse : le parent redonne son nom et son email a Cal.com).
  app.innerHTML='<p class="brand">Lioris</p><h1>Choisissez le créneau du rendez-vous</h1>'+

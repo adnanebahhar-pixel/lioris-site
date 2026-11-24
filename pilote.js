@@ -6,7 +6,7 @@
 if(window.top!==window.self){document.documentElement.innerHTML='';throw new Error('cadre');}
 var CFG=window.LIORIS_BASE||{},SES=null,D=null,z=document.getElementById('zone'),menu=document.getElementById('menu'),vue='bord',arg=null,P=30,Q='';
 var JOUR=864e5,ETATS=['Inscrit','Test passé','Rendez-vous','Programme en cours','Fin de trimestre'];
-var PACKS=[['college-seconde','Collège et seconde, 18 h',630,18],['premiere-terminale-18h','Première et terminale, 18 h',720,18],['prepa-superieur-18h','Prépa et supérieur, 18 h',900,18],['maths-premiere-terminale-24h','Maths première et terminale, 24 h',960,24],['maths-prepa-24h','Maths prépa, 24 h',1200,24],['organisation-methode-12h','Organisation et méthode, 12 h',600,12]];
+var PACKS=[['college-seconde','Collège et seconde, 18 h',630,18],['premiere-terminale-18h','Première et terminale, 18 h',720,18],['prepa-superieur-18h','Prépa et supérieur, 18 h',900,18],['maths-premiere-terminale-24h','Maths première et terminale, 24 h',960,24],['maths-prepa-24h','Maths prépa, 24 h',1200,24]];
 var NAV=[['','Pilotage'],['bord','Vue d\'ensemble'],['ventes','Entonnoir de vente'],['','Familles'],['familles','Familles et élèves'],['tests','Tests'],['rdv','Rendez-vous'],['demandes','Demandes'],['','Cours'],['seances','Programmes et séances'],['profs','Professeurs'],['rapports','Comptes rendus et rapports'],['','Argent'],['paiements','Ventes et paiements'],['','Audience'],['trafic','Trafic'],['seo','SEO'],['geo','GEO'],['','Système'],['liens','Liens et réglages']];
 
 // ---------- outils

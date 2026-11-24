@@ -39,6 +39,5 @@ Allow: /
 Disallow: /admin.html
 Disallow: /inscription.html
 Disallow: /test.html
-Disallow: /bilan.html
 
 Sitemap: https://lioris.fr/sitemap.xml

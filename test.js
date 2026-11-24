@@ -70,13 +70,13 @@ function redaction(){
 function fin(photo){
  var RES={pack:window.PACK,niveau:niveau,eleve:ins.eleve||'',parent:ins.parent||'',duree:Math.round((Date.now()-debut)/1000),reponses:rep,redaction:aRedaction(),photo:photo,fin:new Date().toISOString()};if(JETON&&window.CRM){window.CRM.depot=window.CRM.deposer(JETON,RES).then(function(ok){if(!ok)L.ecrire('lioris_resultat',RES);return ok;});}else{L.ecrire('lioris_resultat',RES);if(window.CRM)window.CRM.resultat(RES);}
  var file=[];try{file=JSON.parse(sessionStorage.getItem('lioris_file')||'[]');}catch(e){}
- var suivant=file.shift(),moi=ins.qui==='moi';try{sessionStorage.setItem('lioris_file',JSON.stringify(file));}catch(e){}
- if((!suivant||suivant==='bilan')&&window.CRM&&window.CRM.nettoyer)window.CRM.depot.then(function(){window.CRM.nettoyer();});
- var lien=suivant?(suivant==='bilan'?'bilan.html?qui='+(moi?'eleve':'parent'):'test.html?pack='+suivant):'';
+ file=file.filter(function(k){return window.DIAGS[k];});var suivant=file.shift(),moi=ins.qui==='moi';try{sessionStorage.setItem('lioris_file',JSON.stringify(file));}catch(e){}
+ if(!suivant&&window.CRM&&window.CRM.nettoyer)window.CRM.depot.then(function(){window.CRM.nettoyer();});
+ var lien=suivant?'test.html?pack='+suivant:'';
  app.innerHTML='<p class="brand">Lioris</p><div class="t-fin"><span class="t-ok" aria-hidden="true"><svg viewBox="0 0 48 48"><path pathLength="1" d="M12 25 L21 34 L37 15"/></svg></span>'+
   '<h1>'+(suivant?'Ce test est terminé.':'C\'est terminé, merci.')+'</h1>'+
   '<p class="lead">'+(suivant?'Tes réponses sont enregistrées. Il te reste '+(file.length+1)+' étape'+(file.length?'s':'')+' : tu peux faire une pause avant de continuer.':'Tes réponses sont enregistrées. Tu n\'as pas de note : le test sert à savoir quoi travailler.')+'</p></div>'+
-  (suivant?'<p><a class="btn" href="'+lien+'">'+(suivant==='bilan'?'Passer au bilan d\'organisation':'Passer au test suivant : '+esc(window.DIAGS[suivant]?window.DIAGS[suivant].titre:suivant))+'</a></p>':'')+
+  (suivant?'<p><a class="btn" href="'+lien+'">'+('Passer au test suivant : '+esc(window.DIAGS[suivant].titre))+'</a></p>':'')+
   '<h2 class="t-h2">Ce qui se passe maintenant</h2>'+
   '<ol class="t-suite"><li class="fait"><b>Le test</b><span>fait</span></li><li class="ici"><b>Le rendez-vous</b><span>'+(moi?'un professeur t\'explique tes réponses en visio':'un professeur explique tes réponses à ton parent, en visio')+'</span></li><li><b>Le plan écrit</b><span>ce qu\'il faut reprendre, dans l\'ordre</span></li></ol>'+
   (suivant?'':'<p class="note">'+(moi?'Tu reçois un email avec la date et l\'heure du rendez-vous.':'Ton parent reçoit un email avec la date et l\'heure du rendez-vous.')+'</p>')+
