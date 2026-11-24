@@ -247,3 +247,26 @@ html:not(.onglets) .niveaux { display:none; }
   .ecran .t-nav .btn { margin-top:8px; }
 }
 @media (prefers-reduced-motion:reduce) { .ecran .t-choix .opt, .ecran .opt.sel .t-l svg, .ecran .t-ok svg { transition:none; animation:none; stroke-dashoffset:0; } }
+
+/* Pages de contenu (erreurs frequentes) : meme colonne de lecture que les pages legales, plus la copie et les exercices */
+.contenu .c-copie { margin:8px 0 34px; max-width:640px; }
+.contenu .c-copie .enonce { font-family:var(--maths); font-size:21px; margin:0 0 14px; }
+.contenu .c-copie .qui { font-size:12.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:14px 0 4px; }
+.contenu .c-copie .rep { font-family:var(--maths); font-size:20px; line-height:1.6; margin:0; }
+.contenu .c-copie .rep.faux { color:var(--rouge); }
+.contenu .c-exo { border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin:0 0 12px; background:var(--feuille); }
+.contenu .c-exo p { margin:0 0 8px; font-family:var(--maths); font-size:18.5px; line-height:1.55; }
+.contenu .c-exo p b { font-family:var(--texte); font-size:15px; }
+.contenu details { border-bottom:1px solid var(--line); padding:12px 0; }
+.contenu .c-exo details { border:0; padding:0; }
+.contenu summary { cursor:pointer; font-weight:600; }
+.contenu .c-exo summary { color:var(--cta); font-size:15.5px; }
+.contenu details p { margin:10px 0 0; }
+.contenu .c-suite { margin:48px 0 8px; padding:26px 28px; background:var(--bande); border-radius:12px; }
+.contenu .c-suite h2 { margin-top:0; }
+.contenu .c-suite .btn { display:inline-block; }
+.contenu .c-liste { list-style:none; padding:0; }
+.contenu .c-liste li { padding:14px 0; border-bottom:1px solid var(--line); max-width:none; }
+.contenu .c-liste a { color:var(--ink); text-decoration:none; font-size:18px; }
+.contenu .c-liste a:hover { color:var(--cta); }
+.contenu .c-liste span { display:block; font-size:14px; color:var(--muted); margin-top:2px; }
