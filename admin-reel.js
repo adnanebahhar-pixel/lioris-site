@@ -8,7 +8,7 @@ function fmt(s){return h(s).replace(/\^\(([^)]+)\)/g,'<sup>$1</sup>').replace(/\
 function jour(iso){if(!iso)return '';var d=new Date(iso);return isNaN(d)?h(iso):d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})+(iso.length>10?', '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'');}
 function heures(iso){return (Date.now()-new Date(iso).getTime())/36e5;}
 // ---------- Base en ligne : connexion de l'administration, lecture et ecriture des fiches. Sans cle dans lio-config.js, tout reste local.
-var CFG=window.LIORIS_BASE||{},EN_LIGNE=!!(CFG.url&&CFG.cle),SES=null,CACHE=null,ROLE='';
+var CFG=window.LIORIS_BASE||{},EN_LIGNE=!!(CFG.url&&CFG.cle),SES=null,CACHE=null,ROLE='',DEM=[];
 function hdr(tok){var x={'Content-Type':'application/json',apikey:CFG.cle};if(tok)x.Authorization='Bearer '+tok;return x;}
 function sesEcrire(s){SES=s;try{if(s)localStorage.setItem('lioris_session',JSON.stringify(s));else localStorage.removeItem('lioris_session');}catch(e){}}
 try{SES=JSON.parse(localStorage.getItem('lioris_session')||'null');}catch(e){SES=null;}
@@ -24,7 +24,13 @@ function charger(){return api('GET','profils?select=role&id=eq.'+SES.uid).then(f
   var ts=(e.tests||[]).slice().sort(function(a,b){return a.passe_le<b.passe_le?1:-1;}),x=ts[0],r=(e.rendez_vous||[])[0],jt=e.jetons||[],cles=jt.map(function(j){return j.cle;}),k=cles.length?cles.join(','):(x?x.cle:'');
   CACHE.push({id:e.id,fid:fa.id,rid:r?r.id:null,parent:fa.parent_prenom||'',email:fa.email||'',tel:fa.telephone||'',eleve:e.prenom,classe:e.classe||'',pack:k,programme:(cles.length?cles:[k]).map(titreDe).join(' · '),pourSoi:!!e.pour_soi,attendus:jt.filter(function(j){return !j.utilise;}).map(function(j){return titreDe(j.cle);}),tests:ts.map(function(y){return {pack:y.cle,niveau:y.niveau,reponses:y.reponses||{},redaction:y.redaction,duree:y.duree_s||0,fin:y.passe_le};}),etat:e.etat,prof:(r&&r.professeur_nom)||'',rdv:(r&&r.quand)?local(r.quand):'',accord:fa.accord_parental,contact:fa.accepte_contact,cree:fa.cree_le,
    test:x?{pack:x.cle,niveau:x.niveau,reponses:x.reponses||{},redaction:x.redaction,duree:x.duree_s||0,fin:x.passe_le}:null,
-   journal:(fa.journal||[]).slice().sort(function(a,b){return a.quand<b.quand?1:-1;}).map(function(j){return {d:j.quand,t:j.texte};})});});});});}
+   journal:(fa.journal||[]).slice().sort(function(a,b){return a.quand<b.quand?1:-1;}).map(function(j){return {d:j.quand,t:j.texte};})});});});
+  return api('GET','demandes?select=*&traite=is.false&order=cree_le.desc').then(function(d){DEM=d||[];},function(){DEM=[];});});}
+// Demandes de retractation, d'arret ou de rappel venues du site : a traiter en premier.
+function demandes(){if(!EN_LIGNE||!DEM.length)return '';var N={retractation:'Rétractation',arret:'Arrêt du programme',rappel:'Demande de rappel'};
+ return '<div class="bloc" role="alert"><h2>Demandes à traiter en priorité</h2><ul class="afaire">'+DEM.map(function(d){return '<li><span class="pt"></span><span><b>'+h(N[d.type]||d.type)+'</b> · '+h(d.nom)+' · '+h(d.email)+'<small>'+jour(d.cree_le)+' · '+h(d.programme||'')+(d.message?' · '+h(d.message):'')+' · référence '+h(String(d.id).slice(0,8).toUpperCase())+'</small></span><button type="button" class="act" data-dem="'+h(d.id)+'">Marquer traitée</button></li>';}).join('')+'</ul></div>';}
+document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('[data-dem]');if(!b)return;b.disabled=true;
+ api('PATCH','demandes?id=eq.'+encodeURIComponent(b.getAttribute('data-dem')),{traite:true}).then(charger).then(function(){A.va('bord');});});
 function F(){return EN_LIGNE?(CACHE||[]):window.CRM.familles();}
 function fam(id){return EN_LIGNE?F().filter(function(x){return x.id===id;})[0]:window.CRM.famille(id);}
 function bandeau(){var bm=document.querySelector('.maquette span');if(!bm)return;if(mode!=='reel'){bm.textContent='Maquette de l\'outil d\'administration. Toutes les données sont fictives, rien n\'est enregistré.';return;}
@@ -54,6 +60,7 @@ var ETATS=['Inscrit','Test passé','Rendez-vous','Programme en cours','Fin de tr
 function vide(t){return '<div class="bloc vide"><b>'+t+'</b>Faites une inscription depuis le site, ou ajoutez une famille à la main.<p style="margin-top:16px"><a class="act plein" style="text-decoration:none;display:inline-block" href="commencer.html">Faire une inscription d\'essai</a> <button type="button" class="act" data-r="ajout">Ajouter une famille</button></p></div>';}
 reel.bord=function(){var f=F(),l=afaire();
  var o='<h1>Tableau de bord</h1><p class="sous-titre">'+new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})+'. Données enregistrées dans ce navigateur.</p>';
+ o+=demandes();
  if(!f.length)return o+vide('Aucune famille pour le moment');
  o+='<div class="chiffres">'+[[f.length,'famille suivie','familles suivies'],[f.filter(function(x){return x.test;}).length,'test passé','tests passés'],[f.filter(function(x){return x.rdv;}).length,'rendez-vous fixé','rendez-vous fixés'],[l.length,'chose à faire','choses à faire']].map(function(c){return '<div class="bloc"><b>'+c[0]+'</b><span>'+(c[0]>1?c[2]:c[1])+'</span></div>';}).join('')+'</div>';
  o+='<div class="bloc"><h2>À faire</h2>'+(l.length?'<ul class="afaire">'+l.map(function(x){return '<li><span class="pt '+x[0]+'"></span><span>'+x[1]+'<small>'+x[2]+'</small></span><button type="button" class="act" data-f="'+x[4]+'">'+x[3]+'</button></li>';}).join('')+'</ul>':'<p class="small" style="margin:0">Rien en attente.</p>')+'</div>';
