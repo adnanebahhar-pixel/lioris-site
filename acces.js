@@ -3,6 +3,7 @@
 // Une seule lecture : la fonction page_lien de la base, qui ne rend que ce que le porteur du lien a le droit de voir.
 (function(){
 'use strict';
+if(window.top!==window.self){document.documentElement.innerHTML='';throw new Error('cadre');}
 var CFG=window.LIORIS_BASE||{},z=document.getElementById('zone'),J=(/l=([0-9a-f-]{36})/i.exec(location.hash)||[])[1],P=null,onglet=0,ouvert=null;
 function h(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fmt(s){return h(s).replace(/\^\(([^)]+)\)/g,'<sup>$1</sup>').replace(/\^(−?[\w]+)/g,'<sup>$1</sup>');}
@@ -11,9 +12,9 @@ function jour(iso,court){if(!iso)return '';var d=new Date(iso);if(isNaN(d))retur
 function eur(c){return (c/100).toLocaleString('fr-FR',{maximumFractionDigits:2})+' €';}
 function tag(t,k){return '<span class="tag '+(k||'')+'">'+h(t)+'</span>';}
 function val(i){var e=document.getElementById(i);return e?e.value.trim():'';}
-function titre(k){var N={'college-seconde':'Collège et seconde','premiere-terminale-18h':'Première et terminale','prepa-superieur-18h':'Prépa et supérieur','maths-premiere-terminale-24h':'Maths, première et terminale','maths-prepa-24h':'Maths, prépa','organisation-methode-12h':'Organisation et méthode'};return N[k]||((window.DIAGS&&window.DIAGS[k])?window.DIAGS[k].titre:k);}
+function titre(k){var N={'college-seconde':'Collège et seconde','premiere-terminale-18h':'Première et terminale','prepa-superieur-18h':'Prépa et supérieur','maths-premiere-terminale-24h':'Maths, première et terminale','maths-prepa-24h':'Maths, prépa','organisation-methode-12h':'Organisation et méthode'};return (Object.prototype.hasOwnProperty.call(N,k)&&N[k])||(window.DIAGS&&Object.prototype.hasOwnProperty.call(window.DIAGS,k)&&window.DIAGS[k].titre)||k;}
 function rpc(nom,corps){return fetch(CFG.url+'/rest/v1/rpc/'+nom,{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.cle},body:JSON.stringify(corps)}).then(function(r){return r.text().then(function(x){if(!r.ok)throw new Error(x);return x?JSON.parse(x):null;});});}
-function lecture(t){var D0=window.DIAGS&&window.DIAGS[t.cle],o={ok:0,total:0,erreurs:[],sans:0,titre:D0?D0.titre:t.cle};if(!D0)return o;
+function lecture(t){var D0=window.DIAGS&&Object.prototype.hasOwnProperty.call(window.DIAGS,t.cle)?window.DIAGS[t.cle]:null,o={ok:0,total:0,erreurs:[],sans:0,titre:D0?D0.titre:t.cle};if(!D0||!D0.blocs)return o;
  Object.keys(D0.blocs).forEach(function(b){D0.blocs[b].questions.forEach(function(q){var x=(t.reponses||{})[q.id];if(!x)return;o.total++;
   if(x.k==='ok')o.ok++;else if(/^bad\d+$/.test(x.k)){var n=+x.k.slice(3);o.erreurs.push({id:q.id,q:q.q,rep:q.bad[n],err:q.err[n]||'',bloc:D0.blocs[b].titre});}else o.sans++;});});return o;}
 function blocTest(t,detail){var L=lecture(t),o='<div class="bloc"><h2>'+h(L.titre)+'</h2><p style="margin:0"><b>'+L.ok+' bonnes réponses sur '+L.total+'</b>'+(L.sans?' · '+L.sans+' sans réponse':'')+' · passé le '+jour(t.passe_le,1)+'</p>';
@@ -24,7 +25,7 @@ function cr(c,interne){if(!c)return '';var L=[['Travaillé',c.travaille],['Ce qu
 function etatS(s){return tag(s.etat,{'faite':'v','manquée':'r','reportée':'j','annulée':'r'}[s.etat]||'');}
 function prochaine(L){var n=Date.now()-36e5*2;return L.filter(function(s){return s.etat==='prévue'&&new Date(s.quand).getTime()>n;})[0];}
 function blocProchaine(s,qui){if(!s)return '<div class="bloc"><h2>Prochaine séance</h2><p class="petit" style="margin:0">Aucune séance prévue pour le moment.</p></div>';
- return '<div class="bloc alerte" style="border-color:var(--cta)"><h2>Prochaine séance</h2><p style="font-size:19px;margin:0 0 6px"><b>'+jour(s.quand)+'</b> · '+s.duree_min+' minutes'+(qui?' · '+h(qui):'')+'</p>'+(s.visio?'<p style="margin:10px 0 0"><a class="act plein" href="'+h(s.visio)+'" target="_blank" rel="noopener">Rejoindre la visio</a></p>':'<p class="petit" style="margin:0">Le lien de la visio sera affiché ici.</p>')+'</div>';}
+ return '<div class="bloc alerte" style="border-color:var(--cta)"><h2>Prochaine séance</h2><p style="font-size:19px;margin:0 0 6px"><b>'+jour(s.quand)+'</b> · '+s.duree_min+' minutes'+(qui?' · '+h(qui):'')+'</p>'+(/^https:\/\//.test(s.visio||'')?'<p style="margin:10px 0 0"><a class="act plein" href="'+h(s.visio)+'" target="_blank" rel="noopener">Rejoindre la visio</a></p>':'<p class="petit" style="margin:0">Le lien de la visio sera affiché ici.</p>')+'</div>';}
 function onglets(L){return L.length>1?'<div class="onglets" role="tablist">'+L.map(function(x,i){return '<button type="button" class="act" role="tab" data-a="onglet" data-id="'+i+'" aria-selected="'+(i===onglet)+'"'+(i===onglet?' style="background:var(--ink);color:#fff"':'')+'>'+h(x)+'</button>';}).join('')+'</div>':'';}
 
 // ---------- parent
@@ -39,7 +40,7 @@ function vueParent(){var o='<h1>Bonjour '+h(P.prenom)+'</h1><p class="petit" sty
   o+='<h3>Séances</h3><div class="tw"><table><thead><tr><th>N°</th><th>Date</th><th>État</th><th>Présence</th></tr></thead><tbody>'+g.seances.map(function(s){return '<tr><td>'+(s.numero||'')+'</td><td>'+jour(s.quand)+'</td><td>'+etatS(s)+'</td><td>'+(s.present===true?'présent':s.present===false?tag('absent','r'):'')+'</td></tr>';}).join('')+'</tbody></table></div></div>';});
  e.tests.forEach(function(t){o+=blocTest(t,false);});
  if(!e.tests.length&&!e.programmes.length)o+='<div class="bloc"><h2>Test</h2><p style="margin:0">'+h(e.prenom)+' n\'a pas encore passé son test. Le lien du test est dans l\'email reçu à l\'inscription.</p></div>';
- if(P.commandes.length)o+='<div class="bloc"><h2>Paiements</h2><ul class="fil">'+P.commandes.map(function(c){return '<li><b>'+h((c.packs||[]).map(titre).join(' + '))+'</b> · '+eur(c.total_centimes)+' · '+(c.mode==='3x'?'en trois mensualités':'en une fois')+' '+(c.paye_le?tag('payé le '+jour(c.paye_le,1),'v'):tag('en attente','j'))+(c.url?' <a href="'+h(c.url)+'" target="_blank" rel="noopener">Payer</a>':'')+'</li>';}).join('')+'</ul></div>';
+ if(P.commandes.length)o+='<div class="bloc"><h2>Paiements</h2><ul class="fil">'+P.commandes.map(function(c){return '<li><b>'+h((c.packs||[]).map(titre).join(' + '))+'</b> · '+eur(c.total_centimes)+' · '+(c.mode==='3x'?'en trois mensualités':'en une fois')+' '+(c.paye_le?tag('payé le '+jour(c.paye_le,1),'v'):tag('en attente','j'))+(/^https:\/\//.test(c.url||'')?' <a href="'+h(c.url)+'" target="_blank" rel="noopener">Payer</a>':'')+'</li>';}).join('')+'</ul></div>';
  return o+'<p class="petit">Une question, un changement de créneau : <a href="mailto:contact@lioris.fr">contact@lioris.fr</a>. Pour vous rétracter ou arrêter : <a href="arreter.html">cette page</a>.</p>';}
 
 // ---------- eleve
@@ -62,7 +63,7 @@ function vueProf(){var S=toutesSeances(),now=Date.now();
   if(retard.length)o+='<div class="bloc alerte"><h2>Comptes rendus à rendre ('+retard.length+')</h2><ul class="liste">'+retard.map(function(s){return '<li><span class="pt"></span><span><b>'+h(s.e.prenom)+'</b>, séance '+(s.numero||'')+'<small>'+jour(s.quand)+'</small></span><button type="button" class="act plein" data-a="ouvre" data-id="'+s.id+'">Rendre</button></li>';}).join('')+'</ul></div>';
   var rd=[];P.eleves.forEach(function(e){e.rendez_vous.forEach(function(r){if(r.quand&&r.etat==='prévu')rd.push([e,r]);});});
   if(rd.length)o+='<div class="bloc"><h2>Rendez-vous de résultats</h2><ul class="fil">'+rd.map(function(x){return '<li><b>'+h(x[0].prenom)+'</b> ('+h(x[0].classe)+')<small>'+jour(x[1].quand)+' · le test est dans « Mes élèves »</small></li>';}).join('')+'</ul></div>';
-  o+='<div class="bloc"><h2>Séances à venir</h2>'+(av.length?'<ul class="liste">'+av.slice(0,30).map(function(s){return '<li><span class="pt g"></span><span><b>'+h(s.e.prenom)+'</b>, séance '+(s.numero||'')+'<small>'+jour(s.quand)+' · '+s.duree_min+' min</small></span>'+(s.visio?'<a class="act" href="'+h(s.visio)+'" target="_blank" rel="noopener">Visio</a>':'<span></span>')+'</li>';}).join('')+'</ul>':'<p class="petit" style="margin:0">Aucune séance prévue.</p>')+'</div>';
+  o+='<div class="bloc"><h2>Séances à venir</h2>'+(av.length?'<ul class="liste">'+av.slice(0,30).map(function(s){return '<li><span class="pt g"></span><span><b>'+h(s.e.prenom)+'</b>, séance '+(s.numero||'')+'<small>'+jour(s.quand)+' · '+s.duree_min+' min</small></span>'+(/^https:\/\//.test(s.visio||'')?'<a class="act" href="'+h(s.visio)+'" target="_blank" rel="noopener">Visio</a>':'<span></span>')+'</li>';}).join('')+'</ul>':'<p class="petit" style="margin:0">Aucune séance prévue.</p>')+'</div>';
  }else{
   if(!P.eleves.length)o+='<div class="bloc"><p style="margin:0">Aucun élève ne vous est encore attribué.</p></div>';
   P.eleves.forEach(function(e){o+='<details class="bloc"'+(P.eleves.length===1?' open':'')+'><summary>'+h(e.prenom)+' · '+h(e.classe)+'</summary><p class="petit" style="margin:6px 0 0">Parent : '+h(e.parent)+'</p>';

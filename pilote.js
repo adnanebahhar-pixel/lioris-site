@@ -3,6 +3,7 @@
 // Le bloc de paiement appelle la fonction creer-paiement ecrite par le chantier Stripe : les montants viennent de Stripe.
 (function(){
 'use strict';
+if(window.top!==window.self){document.documentElement.innerHTML='';throw new Error('cadre');}
 var CFG=window.LIORIS_BASE||{},SES=null,D=null,z=document.getElementById('zone'),menu=document.getElementById('menu'),vue='bord',arg=null,P=30,Q='';
 var JOUR=864e5,ETATS=['Inscrit','Test passé','Rendez-vous','Programme en cours','Fin de trimestre'];
 var PACKS=[['college-seconde','Collège et seconde, 18 h',630,18],['premiere-terminale-18h','Première et terminale, 18 h',720,18],['prepa-superieur-18h','Prépa et supérieur, 18 h',900,18],['maths-premiere-terminale-24h','Maths première et terminale, 24 h',960,24],['maths-prepa-24h','Maths prépa, 24 h',1200,24],['organisation-methode-12h','Organisation et méthode, 12 h',600,12]];
@@ -21,7 +22,7 @@ function tag(t,k){return '<span class="tag '+(k||'')+'">'+h(t)+'</span>';}
 function nm(){return '<b class="nm">non mesuré</b>';}
 function kpi(v,l,aide){return '<div class="kpi">'+(v===null||v===undefined?nm():'<b>'+h(v)+'</b>')+'<span>'+h(l)+'</span>'+(aide?'<span>'+h(aide)+'</span>':'')+'</div>';}
 function pct(a,b){if(!(b>0))return null;var r=a/b*100;return (r>0&&r<10?r.toFixed(1).replace('.',','):Math.round(r))+' %';}
-function titreTest(k){return (window.DIAGS&&window.DIAGS[k])?window.DIAGS[k].titre:(k||'');}
+function titreTest(k){return (window.DIAGS&&Object.prototype.hasOwnProperty.call(window.DIAGS,k)&&window.DIAGS[k].titre)||k||'';}
 function titrePack(k){var p=PACKS.filter(function(x){return x[0]===k;})[0];return p?p[1]:titreTest(k);}
 function vide(t,s){return '<div class="bloc vide"><b>'+h(t)+'</b>'+h(s||'')+'</div>';}
 function periode(){return '<div class="periode" role="group" aria-label="Période">'+[[7,'7 jours'],[30,'30 jours'],[90,'90 jours'],[0,'Depuis le début']].map(function(x){return '<button type="button" data-a="periode" data-id="'+x[0]+'" aria-pressed="'+(P===x[0])+'">'+x[1]+'</button>';}).join('')+'</div>';}
@@ -35,13 +36,15 @@ function garde(j){if(j&&j.access_token)sesEcrire({access_token:j.access_token,re
 function jeton(){if(!SES)return Promise.reject(new Error('non connecté'));if(SES.expire>Date.now()+60000)return Promise.resolve(SES.access_token);
  return auth('token?grant_type=refresh_token',{refresh_token:SES.refresh_token}).then(garde).then(function(){return SES.access_token;});}
 function api(methode,chemin,corps,prefer){return jeton().then(function(tk){var x=hdr(tk);if(prefer)x.Prefer=prefer;return fetch(CFG.url+'/rest/v1/'+chemin,{method:methode,headers:x,body:corps?JSON.stringify(corps):undefined});}).then(function(r){return r.text().then(function(x){if(!r.ok)throw new Error(x);return x?JSON.parse(x):null;});});}
+// La base rend 1 000 lignes au plus par appel : on lit par tranches.
+function tout(chemin,acc,n){acc=acc||[];n=n||0;return api('GET',chemin+'&limit=1000&offset='+n).then(function(r){acc=acc.concat(r||[]);return (r||[]).length===1000&&n<30000?tout(chemin,acc,n+1000):acc;});}
 function noter(t){return api('POST','actions',{auteur_id:SES.uid,texte:t}).catch(function(){});}
 function journal(fid,t){return api('POST','journal',{famille_id:fid,auteur_id:SES.uid,texte:t});}
 function tri(c,inv){return function(a,b){return (a[c]||'')<(b[c]||'')?(inv?1:-1):(a[c]||'')>(b[c]||'')?(inv?-1:1):0;};}
 function charger(){var d0=new Date(Date.now()-200*JOUR).toISOString().slice(0,10);
  return api('GET','profils?select=role&id=eq.'+SES.uid).then(function(pr){if(!pr||!pr[0]||pr[0].role!=='admin')throw new Error('droit');
   return Promise.all([api('GET','familles?select=*,eleves(*,tests(*),rendez_vous(*),jetons(cle,utilise),commandes(*),programmes(*,seances(*),rapports(*))),journal(*)&order=cree_le.desc'),
-   api('GET','professeurs?select=*&order=prenom'),api('GET','liens?select=*&order=cree_le.desc'),api('GET','demandes?select=*&order=cree_le.desc'),api('GET','visites?select=*&jour=gte.'+d0),
+   api('GET','professeurs?select=*&order=prenom'),api('GET','liens?select=*&order=cree_le.desc'),api('GET','demandes?select=*&order=cree_le.desc'),tout('visites?select=*&jour=gte.'+d0+'&order=jour.desc'),
    api('GET','seo_releves?select=*&order=releve_le.desc,id.desc'),api('GET','geo_releves?select=*&order=releve_le.desc,id.desc&limit=600'),api('GET','actions?select=*&order=quand.desc&limit=80'),api('GET','reglages?select=*')]);})
  .then(function(r){D={fam:r[0]||[],prof:r[1]||[],liens:r[2]||[],dem:r[3]||[],vis:r[4]||[],seo:r[5]||[],geo:r[6]||[],act:r[7]||[],reg:{},el:[],cmd:[],prog:[],sea:[]};
   (r[8]||[]).forEach(function(x){D.reg[x.cle]=x.valeur;});
@@ -57,7 +60,7 @@ function nomProf(id){var p=prof(id);return p?p.prenom+(p.nom?' '+p.nom:''):'';}
 function optsProf(sel){return '<option value="">à attribuer</option>'+D.prof.filter(function(p){return p.actif||p.id===sel;}).map(function(p){return '<option value="'+p.id+'"'+(p.id===sel?' selected':'')+'>'+h(nomProf(p.id))+'</option>';}).join('');}
 
 // ---------- lecture d'un test : bonnes reponses, erreurs nommees
-function lecture(t){var D0=window.DIAGS&&window.DIAGS[t.cle],o={ok:0,total:0,erreurs:[],sans:0,titre:D0?D0.titre:t.cle};if(!D0)return o;
+function lecture(t){var D0=window.DIAGS&&Object.prototype.hasOwnProperty.call(window.DIAGS,t.cle)?window.DIAGS[t.cle]:null,o={ok:0,total:0,erreurs:[],sans:0,titre:D0?D0.titre:t.cle};if(!D0||!D0.blocs)return o;
  Object.keys(D0.blocs).forEach(function(b){D0.blocs[b].questions.forEach(function(q){var x=(t.reponses||{})[q.id];if(!x)return;o.total++;
   if(x.k==='ok')o.ok++;else if(/^bad\d+$/.test(x.k)){var n=+x.k.slice(3);o.erreurs.push({id:q.id,q:q.q,rep:q.bad[n],err:q.err[n]||'',bloc:D0.blocs[b].titre});}else o.sans++;});});return o;}
 
@@ -95,7 +98,7 @@ function vueEntonnoir(){var E=entonnoir(),max=Math.max.apply(null,E.map(function
  return o;}
 
 // ---------- vues
-var V={};
+var V=Object.create(null);
 V.connexion=function(){return '<h1>Pilotage</h1><p class="st">Réservé à l\'administration de Lioris.</p><div class="bloc" style="max-width:440px"><div class="form" style="grid-template-columns:1fr"><div><label for="c-email">Email</label><input type="email" id="c-email" autocomplete="username"></div><div><label for="c-mdp">Mot de passe</label><input type="password" id="c-mdp" autocomplete="current-password"></div></div><p class="msg" id="msg" aria-live="polite"></p><p style="margin:8px 0 0"><button type="button" class="act plein" data-a="connecte">Se connecter</button></p></div>';};
 V.bord=function(){var l=afaire(),ca=D.cmd.filter(function(c){return c.paye_le&&inP(c.paye_le);}).reduce(function(a,c){return a+c.total_centimes;},0),E=entonnoir(),enCours=D.prog.filter(function(g){return !g.arrete_le&&g.seances.some(function(s){return s.etat==='prévue';});}).length;
  var sem=D.sea.filter(function(s){var q=new Date(s.quand).getTime();return q>Date.now()-36e5&&q<Date.now()+7*JOUR&&s.etat==='prévue';});
@@ -189,7 +192,7 @@ V.seance=function(id){var s=D.sea.filter(function(x){return x.id===id;})[0];if(!
  return '<p><button type="button" class="act" data-a="va" data-v="fiche" data-id="'+e.id+'">Fiche de '+h(e.prenom)+'</button> <button type="button" class="act" data-a="va" data-v="seances">Toutes les séances</button></p><h1>Séance '+(s.numero||'')+' de '+h(e.prenom)+'</h1><p class="st">'+h(titrePack(s.prog.cle))+' · '+h(nomProf(s.prog.professeur_ref)||'professeur à attribuer')+'</p><div class="bloc"><div class="form"><div><label for="se-quand">Date et heure</label><input type="datetime-local" id="se-quand" value="'+local(s.quand)+'"></div><div><label for="se-duree">Durée en minutes</label><input type="number" id="se-duree" value="'+s.duree_min+'" min="15" max="300"></div><div><label for="se-etat">État</label><select id="se-etat">'+['prévue','faite','reportée','manquée','annulée'].map(function(x){return '<option'+(x===s.etat?' selected':'')+'>'+x+'</option>';}).join('')+'</select></div><div><label for="se-pres">Élève présent</label><select id="se-pres"><option value="">non renseigné</option><option value="1"'+(s.eleve_present===true?' selected':'')+'>oui</option><option value="0"'+(s.eleve_present===false?' selected':'')+'>non</option></select></div><div class="large"><label for="se-visio">Lien de la visio</label><input type="text" id="se-visio" value="'+h(s.lien_visio||'')+'" placeholder="https://"></div>'+champsCR(s.compte_rendu)+'</div><p class="petit" style="margin:10px 0">Une séance reportée garde sa ligne : changez sa date et remettez-la à « prévue ». Le professeur remplit le compte rendu depuis sa page ; vous pouvez aussi le faire ici.'+(s.rendu_le?' Compte rendu rendu le '+jour(s.rendu_le)+'.':'')+'</p><button type="button" class="act plein" data-a="sea-enr" data-id="'+s.id+'">Enregistrer</button><p class="msg" id="msg" aria-live="polite"></p></div>';};
 V.profs=function(){var o='<h1>Professeurs</h1><p class="st">Chaque professeur entre par son lien personnel : ses élèves, son planning, ses comptes rendus. Il ne voit ni les prix ni les autres familles.</p>';
  D.prof.forEach(function(p){var gs=D.prog.filter(function(g){return g.professeur_ref===p.id&&!g.arrete_le;}),rd=D.el.filter(function(e){return e.rdv&&e.rdv.professeur_ref===p.id&&e.rdv.etat==='prévu';}).length,ret=D.sea.filter(function(s){return s.prog.professeur_ref===p.id&&s.etat==='faite'&&!s.compte_rendu;}).length;
-  o+='<div class="bloc"><div class="deux"><div><h2>'+h(nomProf(p.id))+' '+(p.actif?'':tag('inactif','r'))+'</h2><dl class="dl"><dt>Matières</dt><dd>'+(h((p.matieres||[]).join(', '))||'à renseigner')+'</dd><dt>Email</dt><dd>'+(h(p.email)||'non donné')+'</dd><dt>Téléphone</dt><dd>'+(h(p.telephone)||'non donné')+'</dd><dt>Élèves suivis</dt><dd>'+gs.length+(gs.length?' : '+h(gs.map(function(g){return g.el.prenom;}).join(', ')):'')+'</dd><dt>Rendez-vous à venir</dt><dd>'+rd+'</dd><dt>Comptes rendus en retard</dt><dd>'+(ret?tag(String(ret),'r'):'0')+'</dd></dl><p style="margin:12px 0 0"><button type="button" class="act" data-a="prof-actif" data-id="'+p.id+'">'+(p.actif?'Mettre en pause':'Réactiver')+'</button></p></div><div>'+blocLien('professeur',p.id,'Lien du professeur','')+'</div></div></div>';});
+  o+='<div class="bloc"><div class="deux"><div><h2>'+h(nomProf(p.id))+' '+(p.actif?'':tag('inactif','r'))+'</h2><dl class="dl"><dt>Matières</dt><dd>'+(h((p.matieres||[]).join(', '))||'à renseigner')+'</dd><dt>Email</dt><dd>'+(h(p.email)||'non donné')+'</dd><dt>Téléphone</dt><dd>'+(h(p.telephone)||'non donné')+'</dd><dt>Élèves suivis</dt><dd>'+gs.length+(gs.length?' : '+h(gs.map(function(g){return g.el.prenom;}).join(', ')):'')+'</dd><dt>Rendez-vous à venir</dt><dd>'+rd+'</dd><dt>Comptes rendus en retard</dt><dd>'+(ret?tag(String(ret),'r'):'0')+'</dd></dl><p style="margin:12px 0 0"><button type="button" class="act" data-a="prof-actif" data-id="'+p.id+'">'+(p.actif?'Mettre en pause (coupe son lien)':'Réactiver')+'</button></p></div><div>'+blocLien('professeur',p.id,'Lien du professeur','')+'</div></div></div>';});
  if(!D.prof.length)o+=vide('Aucun professeur enregistré','Ajoutez le premier ci-dessous, puis débloquez son lien.');
  o+='<div class="bloc"><h2>Ajouter un professeur</h2><div class="form"><div><label for="pr-prenom">Prénom</label><input type="text" id="pr-prenom"></div><div><label for="pr-nom">Nom</label><input type="text" id="pr-nom"></div><div><label for="pr-email">Email</label><input type="email" id="pr-email"></div><div><label for="pr-tel">Téléphone</label><input type="tel" id="pr-tel"></div><div class="large"><label for="pr-mat">Matières, séparées par une virgule</label><input type="text" id="pr-mat"></div></div><p style="margin:14px 0 0"><button type="button" class="act plein" data-a="prof-cree">Ajouter</button></p><p class="msg" id="msg" aria-live="polite"></p></div>';
  return o;};
@@ -258,7 +261,7 @@ var ACT={
  periode:function(t){P=+t.getAttribute('data-id');va(vue,arg,true);},
  connecte:function(){var em=val('c-email'),mdp=document.getElementById('c-mdp').value;if(!em||!mdp){msg('Email et mot de passe requis.');return;}msg('Un instant…');
   auth('token?grant_type=password',{email:em,password:mdp}).then(function(j){garde(j);ouvrir();}).catch(function(e){msg(/invalid/i.test(e.message)?'Email ou mot de passe incorrect.':'Refusé : '+e.message);});},
- deconnecte:function(){sesEcrire(null);ouvrir();},
+ deconnecte:function(){var s=SES;sesEcrire(null);if(s)fetch(CFG.url+'/auth/v1/logout',{method:'POST',headers:hdr(s.access_token)}).catch(function(){});ouvrir();},
  copie:function(t){var u=document.getElementById(t.getAttribute('data-id'));if(!u)return;u.select();try{navigator.clipboard.writeText(u.value);}catch(e){document.execCommand('copy');}t.textContent='Copié';},
  'lien-creer':function(t){var ty=t.getAttribute('data-type'),id=t.getAttribute('data-id'),c={type:ty};c[{professeur:'professeur_id',parent:'famille_id',eleve:'eleve_id'}[ty]]=id;t.disabled=true;
   api('POST','liens',c).then(function(){return noter('Lien débloqué ('+ty+')');}).then(function(){return refaire();}).catch(echec);},
@@ -295,10 +298,10 @@ var ACT={
   var c={quand:new Date(val('se-quand')).toISOString(),duree_min:+val('se-duree')||s.duree_min,etat:et,eleve_present:pr===''?null:pr==='1',lien_visio:val('se-visio')||null,compte_rendu:plein?cr:null};if(plein&&!s.rendu_le)c.rendu_le=new Date().toISOString();
   api('PATCH','seances?id=eq.'+s.id,c).then(function(){return et!==s.etat?journal(s.prog.el.fam.id,'Séance '+(s.numero||'')+' de '+s.prog.el.prenom+' : '+et):null;}).then(function(){return refaire('Enregistré.');}).catch(echec);},
  'prof-cree':function(){if(!val('pr-prenom')){document.getElementById('pr-prenom').focus();return;}api('POST','professeurs',{prenom:val('pr-prenom'),nom:val('pr-nom'),email:val('pr-email')||null,telephone:val('pr-tel')||null,matieres:val('pr-mat').split(',').map(function(x){return x.trim();}).filter(Boolean)}).then(function(){return noter('Professeur ajouté : '+val('pr-prenom'));}).then(function(){return refaire();}).catch(echec);},
- 'prof-actif':function(t){var p=prof(t.getAttribute('data-id'));api('PATCH','professeurs?id=eq.'+p.id,{actif:!p.actif}).then(function(){return refaire();}).catch(echec);},
+ 'prof-actif':function(t){var p=prof(t.getAttribute('data-id'));api('PATCH','professeurs?id=eq.'+p.id,{actif:!p.actif}).then(function(){return p.actif?api('PATCH','liens?professeur_id=eq.'+p.id+'&actif=is.true',{actif:false}):null;}).then(function(){return noter(p.actif?'Professeur mis en pause, lien coupé':'Professeur réactivé');}).then(function(){return refaire();}).catch(echec);},
  'dem-traite':function(t){t.disabled=true;api('PATCH','demandes?id=eq.'+t.getAttribute('data-id'),{traite:true}).then(function(){return noter('Demande marquée traitée');}).then(function(){return refaire();}).catch(echec);},
  'rap-enr':function(t){rapport(t,false);},'rap-pub':function(t){rapport(t,true);},
- 'export':function(){var c=function(x){return '"'+String(x==null?'':x).replace(/"/g,'""')+'"';},L=[['Élève','Classe','Parent','Email','Téléphone','État','Inscrit','Test','Rendez-vous','Payé','Provenance','Étiquettes'].map(c).join(';')];
+ 'export':function(){var c=function(x){x=String(x==null?'':x);if(/^[=+\-@\t\r]/.test(x))x="'"+x;return '"'+x.replace(/"/g,'""')+'"';},L=[['Élève','Classe','Parent','Email','Téléphone','État','Inscrit','Test','Rendez-vous','Payé','Provenance','Étiquettes'].map(c).join(';')];
   D.el.forEach(function(e){L.push([e.prenom,e.classe,e.fam.parent_prenom,e.fam.email,e.fam.telephone,e.etat,(e.cree_le||'').slice(0,10),e.tests.length?'oui':'non',e.rdv&&e.rdv.quand?e.rdv.quand.slice(0,16):'',e.commandes.some(function(x){return x.paye_le;})?'oui':'non',e.fam.origine,(e.fam.etiquettes||[]).join(', ')].map(c).join(';'));});
   var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+L.join('\n')],{type:'text/csv'}));a.download='lioris-familles-'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();noter('Export des familles');}
 };
