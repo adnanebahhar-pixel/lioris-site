@@ -176,3 +176,15 @@ html:not(.onglets) .niveaux { display:none; }
 /* Agenda de prise de rendez-vous (Cal.com) dans l'ecran d'inscription */
 .ecran iframe.agenda { display:block; width:100%; height:720px; border:1px solid var(--trait, #D9DEEA); border-radius:14px; background:#fff; margin:22px 0 10px; }
 @media (max-width:640px) { .ecran iframe.agenda { height:860px; } }
+
+/* Pages legales : texte long, une colonne de lecture */
+.interne main > section.legal { padding:56px 0 96px; background:none; }
+.legal h2 { font-size:clamp(22px, 2.2vw, 28px); margin:44px 0 12px; }
+.legal h3 { font-size:19px; margin:28px 0 8px; }
+.legal p, .legal li { max-width:72ch; }
+.legal ul, .legal ol { padding-left:22px; margin:10px 0 16px; }
+.legal li { margin:6px 0; }
+.legal table { width:100%; border-collapse:collapse; margin:18px 0 24px; font-size:15.5px; display:block; overflow-x:auto; }
+.legal th, .legal td { text-align:left; vertical-align:top; padding:10px 12px; border-bottom:1px solid var(--trait, #D9DEEA); }
+.legal th { font-weight:600; background:var(--bande, #EFF2FA); }
+.legal blockquote { margin:16px 0; padding:14px 18px; border-left:3px solid var(--bleu, #2343D6); background:var(--bande, #EFF2FA); }

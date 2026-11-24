@@ -12,7 +12,7 @@ function inscription(){
  '<label for="pe">Prénom de votre enfant</label><input id="pe" type="text" required><label for="cl">Sa classe</label><input id="cl" type="text" required>'+
  '<label for="cr">Créneau pour l\'échange avec le coach</label><select id="cr" required><option value="">Choisir</option><option>Créneau à brancher sur l\'outil de rendez-vous</option></select>'+
  '<p class="small" style="margin-top:6px">Vous pourrez changer ce créneau à tout moment, depuis l\'email de confirmation.</p>'+
- '<label class="check"><input type="checkbox" required><span>Je suis le parent ou le représentant légal de l\'élève, et j\'accepte que nos réponses soient lues par le coach pour préparer l\'échange. <span class="todo">Texte et lien vers la politique de confidentialité à valider.</span></span></label>'+
+ '<label class="check"><input type="checkbox" required><span>Je suis le parent ou le représentant légal de l\'élève, et j\'accepte que nos réponses soient lues par le coach pour préparer l\'échange. <a href="confidentialite.html" target="_blank" rel="noopener">Lire la politique de confidentialité</a>.</span></label>'+
  '<p class="small" style="margin-top:10px">Nous vous recontactons par email, téléphone ou messagerie au sujet du bilan. Vous pouvez demander l\'arrêt à tout moment à contact@lioris.fr.</p>'+
  '<button class="btn" type="submit">Réserver et commencer mon bilan</button><p class="small" style="margin-top:12px">Sans carte bancaire. Aucune obligation.</p></form>'+
  '<p class="note" style="margin-top:18px">Ce bilan décrit des habitudes de travail. Il n\'est pas un acte médical.</p>';
