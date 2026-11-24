@@ -39,4 +39,4 @@
 function va(n,defile){var ok=false;Array.prototype.forEach.call(p,function(x){var m=x.getAttribute('data-n')===n;x.hidden=!m;ok=ok||m;});if(!ok)return va('college');Array.prototype.forEach.call(b,function(x){x.setAttribute('aria-selected',x.getAttribute('data-n')===n?'true':'false');});try{sessionStorage.setItem('lioris-niveau',n);}catch(e){}if(defile)document.getElementById('prix').scrollIntoView();}
 Array.prototype.forEach.call(b,function(x){x.onclick=function(){va(x.getAttribute('data-n'));};});
 var h=location.hash.slice(1),n=null;try{n=sessionStorage.getItem('lioris-niveau');}catch(e){}va(/^(college|seconde|premiere|terminale|prepa|sup)$/.test(h)?h:(n||'college'));})();</script>
-</body></html>
+<script src="lio-config.js?v=852c79b8"></script><script src="compteur.js?v=a98b3584" defer></script></body></html>
