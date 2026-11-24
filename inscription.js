@@ -13,21 +13,26 @@ var h='<p class="brand">Lioris</p><h1>'+(plusieurs?'Vos '+PACKS.length+' tests':
  '<label for="tel">Votre téléphone</label><input id="tel" type="tel" autocomplete="tel">'+
  (MOI?'':'<label for="pe">Prénom de votre enfant</label><input id="pe" type="text" required>')+
  '<label for="cl">'+(MOI?'Votre classe':'Sa classe')+'</label><select id="cl" required><option value="">Choisir</option>'+D.classes.map(function(c){return '<option value="'+c[1]+'">'+L.esc(c[0])+'</option>';}).join('')+'</select>'+
- '<label for="cr">Créneau pour le rendez-vous de résultats</label><select id="cr" required><option value="">Choisir</option><option>Créneau à brancher sur l\'outil de rendez-vous</option></select>'+
- '<p class="small" style="margin-top:6px">Vous pourrez changer ce créneau à tout moment, depuis l\'email de confirmation.</p>'+
  '<label class="check"><input type="checkbox" id="c1" required><span>'+(MOI?'J\'ai 18 ans ou plus, et j\'accepte que mes réponses soient utilisées pour préparer le rendez-vous. Si vous avez moins de 18 ans, c\'est à votre parent de remplir ce formulaire. ':'Je suis le parent ou le représentant légal de l\'élève, et j\'accepte que ses réponses soient utilisées pour préparer le rendez-vous. ')+'<span class="todo">Texte et lien vers la politique de confidentialité à valider.</span></span></label>'+
  '<label class="check"><input type="checkbox" id="c2"><span>J\'accepte d\'être contacté par téléphone, email et messagerie au sujet '+(plusieurs?'de ces tests':'de ce test')+'.</span></label>'+
- '<button class="btn" type="submit">Réserver et recevoir le lien '+(plusieurs?'des tests':'du test')+'</button>'+
- '<p class="small" style="margin-top:12px">Vous recevez le lien par email, tout de suite. Sans carte bancaire. Aucune obligation.</p></form>';
+ '<button class="btn" type="submit">Continuer : choisir le créneau</button>'+
+ '<p class="small" style="margin-top:12px">Étape suivante : le créneau du rendez-vous, puis '+(plusieurs?'les tests':'le test')+'. Sans carte bancaire. Aucune obligation.</p></form>';
 app.innerHTML=h;
+var AGENDA='https://cal.com/lioris/rendez-vous-de-resultats',CRENEAU='à choisir dans l\'agenda';
 function v(i){return document.getElementById(i).value;}
 document.getElementById('f').addEventListener('submit',function(e){e.preventDefault();
  var cl=document.getElementById('cl'),classe=cl.options[cl.selectedIndex].text,eleve=MOI?v('pp'):v('pe');
  // Une fiche d'inscription par test, pour que chaque test retrouve le prenom et la classe. Le code de niveau depend du test : on le retrouve par le nom de la classe.
  PACKS.forEach(function(k){var G=window.DIAGS[k],mot=classe.split(/[ ,]/)[0],c=(k===window.PACK)?[classe,v('cl')]:(G.classes.filter(function(x){return x[0].split(/[ ,]/)[0]===mot;})[0]||[classe,null]);
-  try{localStorage.setItem('lioris_inscription_'+k,JSON.stringify({parent:v('pp'),email:v('em'),tel:v('tel'),eleve:eleve,niveau:c[1],classe:classe,creneau:v('cr'),contact:document.getElementById('c2').checked,qui:MOI?'moi':'enfant',date:new Date().toISOString()}));}catch(e){}});
+  try{localStorage.setItem('lioris_inscription_'+k,JSON.stringify({parent:v('pp'),email:v('em'),tel:v('tel'),eleve:eleve,niveau:c[1],classe:classe,creneau:CRENEAU,contact:document.getElementById('c2').checked,qui:MOI?'moi':'enfant',date:new Date().toISOString()}));}catch(e){}});
  try{sessionStorage.setItem('lioris_file',JSON.stringify(SUITE.concat(ORGA?['bilan']:[])));}catch(e){}
- if(window.CRM)window.CRM.inscription({parent:v('pp'),email:v('em'),tel:v('tel'),eleve:eleve,niveau:v('cl'),classe:classe,creneau:v('cr'),contact:document.getElementById('c2').checked,accord:document.getElementById('c1').checked,packs:PACKS,qui:MOI?'moi':'enfant',origine:'site'});
- var parti=false,go=function(){if(parti)return;parti=true;location.href='test.html?pack='+window.PACK;};
- if(window.CRM&&window.CRM.attente){window.CRM.attente.then(go,go);setTimeout(go,4000);}else go();});
+ if(window.CRM)window.CRM.inscription({parent:v('pp'),email:v('em'),tel:v('tel'),eleve:eleve,niveau:v('cl'),classe:classe,creneau:CRENEAU,contact:document.getElementById('c2').checked,accord:document.getElementById('c1').checked,packs:PACKS,qui:MOI?'moi':'enfant',origine:'site'});
+ // Etape 2 : le creneau du rendez-vous, choisi dans l'agenda Cal.com (rien n'est passe dans l'adresse : le parent redonne son nom et son email a Cal.com).
+ app.innerHTML='<p class="brand">Lioris</p><h1>Choisissez le créneau du rendez-vous</h1>'+
+  '<p class="lead">'+(MOI?'Un professeur vous explique vos résultats en visio. ':'Un professeur vous explique les résultats de votre enfant en visio. ')+'Prenez un créneau qui laisse le temps de passer '+(plusieurs?'les tests':'le test')+' avant.</p>'+
+  '<iframe class="agenda" title="Choisir le créneau du rendez-vous" src="'+AGENDA+'?theme=light"></iframe>'+
+  '<p class="small">L\'agenda ne s\'affiche pas ? <a href="'+AGENDA+'" target="_blank" rel="noopener">Ouvrez-le dans un nouvel onglet</a>. Vous pourrez déplacer ce créneau depuis l\'email de confirmation.</p>'+
+  '<p class="cta" style="margin-top:22px"><a class="btn" href="test.html?pack='+window.PACK+'">'+(plusieurs?'Passer au premier test':'Passer au test')+'</a></p>'+
+  '<p class="small">Vous pouvez aussi '+(plusieurs?'passer les tests':'passer le test')+' d\'abord et réserver ensuite.</p>';
+ window.scrollTo(0,0);});
 })();

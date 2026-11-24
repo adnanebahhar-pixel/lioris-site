@@ -172,3 +172,7 @@ html:not(.onglets) .niveaux { display:none; }
 .suivi .fiche { margin:0; }
 @media (max-width:1020px) { .duo-suivi { grid-template-columns:minmax(0,1fr); gap:36px; } }
 @media (max-width:759px) { .tuiles { grid-template-columns:minmax(0,1fr); } .niveaux button { font-size:16px; padding:9px 15px; } .carte-p .px { font-size:32px; } }
+
+/* Agenda de prise de rendez-vous (Cal.com) dans l'ecran d'inscription */
+.ecran iframe.agenda { display:block; width:100%; height:720px; border:1px solid var(--trait, #D9DEEA); border-radius:14px; background:#fff; margin:22px 0 10px; }
+@media (max-width:640px) { .ecran iframe.agenda { height:860px; } }
