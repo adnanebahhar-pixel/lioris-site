@@ -188,3 +188,62 @@ html:not(.onglets) .niveaux { display:none; }
 .legal th, .legal td { text-align:left; vertical-align:top; padding:10px 12px; border-bottom:1px solid var(--trait, #D9DEEA); }
 .legal th { font-weight:600; background:var(--bande, #EFF2FA); }
 .legal blockquote { margin:16px 0; padding:14px 18px; border-left:3px solid var(--bleu, #2343D6); background:var(--bande, #EFF2FA); }
+
+/* ---------- Ecran du test (2026-11-24) : la copie d'examen. Feuille a carreaux pour l'enonce, reponses lettrees, lettre entouree en rouge quand elle est choisie. */
+.ecran .t-couv { margin:8px 0 34px; }
+.ecran .t-couv .corps { padding-top:26px; padding-bottom:26px; }
+.ecran .t-couv h1 { font-size:clamp(34px, 5.4vw, 52px); margin:0 0 22px; }
+.ecran .t-nom { font-family:var(--main); font-size:30px; line-height:1; color:var(--rouge); margin:0 0 6px; transform:rotate(-2deg); transform-origin:left; }
+.ecran .t-faits { list-style:none; display:flex; flex-wrap:wrap; gap:10px 34px; margin:0; padding:0; }
+.ecran .t-faits li { font-size:14.5px; color:var(--muted); }
+.ecran .t-faits b { display:block; font-family:var(--titre); font-size:30px; line-height:1.05; color:var(--ink); letter-spacing:-.02em; }
+.ecran .t-h2 { font-size:22px; margin:0 0 14px; }
+.ecran .t-regles { list-style:none; margin:0 0 30px; padding:0; }
+.ecran .t-regles li { display:flex; gap:14px; align-items:flex-start; padding:13px 0; border-bottom:1px solid var(--line); }
+.ecran .t-regles li:last-child { border-bottom:0; }
+.ecran .t-regles i { flex:none; width:28px; height:28px; border-radius:50%; background:var(--ink); color:#fff; font-style:normal; font-weight:700; font-size:14px; display:grid; place-items:center; margin-top:1px; }
+.ecran .t-regles b { display:block; }
+.ecran .t-suite { list-style:none; display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:0; margin:0 0 8px; padding:0; counter-reset:e; }
+.ecran .t-suite li { position:relative; padding:18px 14px 0 0; border-top:3px solid var(--line); counter-increment:e; }
+.ecran .t-suite li::before { content:counter(e); position:absolute; top:-13px; left:0; width:23px; height:23px; border-radius:50%; background:var(--bg); border:2px solid var(--line); color:var(--muted); font-size:12px; font-weight:700; display:grid; place-items:center; }
+.ecran .t-suite li.ici { border-top-color:var(--cta); }
+.ecran .t-suite li.ici::before { border-color:var(--cta); background:var(--cta); color:#fff; }
+.ecran .t-suite li.fait { border-top-color:var(--ink); }
+.ecran .t-suite li.fait::before { content:"\2713"; border-color:var(--ink); background:var(--ink); color:#fff; }
+.ecran .t-suite b { display:block; font-size:16px; }
+.ecran .t-suite span { display:block; font-size:14px; line-height:1.35; color:var(--muted); margin-top:2px; }
+.ecran .t-barre { position:sticky; top:0; z-index:5; background:var(--bg); padding:12px 0 0; margin:-12px 0 22px; }
+.ecran .t-info { display:flex; justify-content:space-between; gap:12px; font-size:14.5px; color:var(--muted); }
+.ecran .t-info b { color:var(--ink); }
+.ecran .t-barre .progress { height:8px; border-radius:99px; margin:8px 0 0; }
+.ecran .t-barre .progress > i { background:var(--cta); border-radius:99px; }
+.ecran .t-q { margin:0 0 22px; }
+.ecran .t-q .corps { padding-top:30px; padding-bottom:34px; }
+.ecran .t-q h1.q { font-family:var(--maths); font-weight:500; font-size:clamp(25px, 3.8vw, 34px); line-height:1.3; letter-spacing:0; margin:0; }
+.ecran .t-red { font-family:var(--maths); font-size:20px; line-height:1.6; margin:0; }
+.ecran .t-choix { display:grid; gap:10px; }
+.ecran .t-choix .opt { display:flex; align-items:center; gap:16px; margin:0; padding:12px 18px 12px 12px; border:1.5px solid var(--line); border-radius:12px; font-family:var(--maths); font-size:20px; box-shadow:0 1px 0 rgba(23,32,58,.04); transition:border-color .15s ease, background-color .15s ease, transform .15s ease, box-shadow .15s ease; }
+.ecran .t-choix .opt:hover { border-color:var(--ink); background:var(--feuille); transform:translateY(-1px); box-shadow:0 8px 18px -12px rgba(23,32,58,.5); }
+.ecran .t-choix .opt.sel { background:color-mix(in srgb, var(--cta) 7%, var(--feuille)); border-color:var(--cta); color:var(--ink); box-shadow:0 0 0 1px var(--cta); }
+.ecran .t-l { position:relative; flex:none; width:38px; height:38px; border-radius:50%; background:var(--bande); color:var(--ink); font-family:var(--titre); font-weight:700; font-size:16px; display:grid; place-items:center; }
+.ecran .t-l svg { position:absolute; inset:-7px; width:calc(100% + 14px); height:calc(100% + 14px); fill:none; stroke:var(--rouge); stroke-width:5; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:1; pointer-events:none; }
+.ecran .opt.sel .t-l { background:var(--feuille); }
+.ecran .opt.sel .t-l svg { stroke-dashoffset:0; transition:stroke-dashoffset .35s ease; }
+.ecran .t-t { flex:1; text-align:left; }
+.ecran .t-autres { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 0; }
+.ecran .t-autres .opt { width:auto; min-height:0; margin:0; padding:9px 16px; font-size:15.5px; border-radius:99px; border:1.5px dashed var(--muted); }
+.ecran .t-autres .opt.sel { background:var(--ink); color:#fff; border-style:solid; border-color:var(--ink); }
+.ecran .t-nav { margin-top:6px; }
+.ecran .t-aide { margin-top:14px; color:var(--muted); }
+.ecran .t-fin { margin:8px 0 26px; }
+.ecran .t-ok { display:grid; place-items:center; width:64px; height:64px; border-radius:50%; background:#DDF3E3; margin:0 0 18px; }
+.ecran .t-ok svg { width:34px; height:34px; fill:none; stroke:#14532D; stroke-width:5; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; animation:t-trace .5s .15s ease forwards; }
+@keyframes t-trace { to { stroke-dashoffset:0; } }
+@media (hover:none), (max-width:640px) { .ecran .t-aide { display:none; } }
+@media (max-width:640px) {
+  .ecran .t-suite { grid-template-columns:1fr; gap:22px; }
+  .ecran .t-choix .opt { font-size:18px; gap:12px; }
+  .ecran .t-nav { position:sticky; bottom:0; background:linear-gradient(to top, var(--bg) 72%, transparent); padding:10px 0 12px; margin-top:0; }
+  .ecran .t-nav .btn { margin-top:8px; }
+}
+@media (prefers-reduced-motion:reduce) { .ecran .t-choix .opt, .ecran .opt.sel .t-l svg, .ecran .t-ok svg { transition:none; animation:none; stroke-dashoffset:0; } }
