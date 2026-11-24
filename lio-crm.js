@@ -34,6 +34,9 @@
   noter:function(id,texte){var b=lire(),f=trouve(b,id);if(!f)return false;note(f,texte);return ecrire(b);},
   retirer:function(id){var b=lire();b.f=b.f.filter(function(x){return x.id!==id;});return ecrire(b);},
   enLigne:enLigne,attente:Promise.resolve(null),depot:Promise.resolve(false),
+  // Lien recu par email (test.html?pack=...&j=...) : le lien porte le jeton, on retrouve le prenom et la classe sans rien garder dans le navigateur.
+  ouvrir:function(jeton){return rpc('ouvrir_test',{p_jeton:jeton});},
+  deposer:function(jeton,r){return rpc('deposer_test',{p_jeton:jeton,p_niveau:r.niveau||'',p_reponses:r.reponses||{},p_redaction:!!r.redaction,p_duree_s:r.duree||0}).then(function(){return true;},function(){return false;});},
   // Fin du parcours : une fois tous les tests arrives dans la base en ligne, on ne laisse dans ce navigateur ni l'inscription ni les reponses (ordinateur partage).
   // On n'efface rien tant qu'une fiche n'est pas arrivee, ni le bilan d'organisation, qui n'est pas encore envoye a la base.
   nettoyer:function(){var b=lire();if(!enLigne()||!b.f.length||b.f.some(function(x){return !(x.jeton&&x.envoye);}))return false;

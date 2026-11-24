@@ -2,6 +2,7 @@
 (function(){
 var app=document.getElementById('app'), D=window.DIAG, L=window.LIO, esc=L.esc, fmt=L.fmt;
 var ins=L.lire('lioris_inscription',{});
+var JETON=(/[?&]j=([0-9a-f-]{36})/.exec(location.search)||[])[1]||'';
 var niveau=D.niveaux.length===1?D.niveaux[0][0]:(ins.niveau||null), liste=[], i=0, prec=0, rep={}, t0=0, debut=0;
 function melange(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1));var x=a[k];a[k]=a[j];a[j]=x;}return a;}
 function aRedaction(){return !!(niveau&&D.blocs[niveau].redaction);}
@@ -47,7 +48,7 @@ function redaction(){
  document.getElementById('fin').onclick=function(){fin(!!document.getElementById('ph').files.length);};
 }
 function fin(photo){
- var RES={pack:window.PACK,niveau:niveau,eleve:ins.eleve||'',parent:ins.parent||'',duree:Math.round((Date.now()-debut)/1000),reponses:rep,redaction:aRedaction(),photo:photo,fin:new Date().toISOString()};L.ecrire('lioris_resultat',RES);if(window.CRM)window.CRM.resultat(RES);
+ var RES={pack:window.PACK,niveau:niveau,eleve:ins.eleve||'',parent:ins.parent||'',duree:Math.round((Date.now()-debut)/1000),reponses:rep,redaction:aRedaction(),photo:photo,fin:new Date().toISOString()};if(JETON&&window.CRM){window.CRM.depot=window.CRM.deposer(JETON,RES).then(function(ok){if(!ok)L.ecrire('lioris_resultat',RES);return ok;});}else{L.ecrire('lioris_resultat',RES);if(window.CRM)window.CRM.resultat(RES);}
  var file=[];try{file=JSON.parse(sessionStorage.getItem('lioris_file')||'[]');}catch(e){}
  var suivant=file.shift(),moi=ins.qui==='moi';try{sessionStorage.setItem('lioris_file',JSON.stringify(file));}catch(e){}
  if((!suivant||suivant==='bilan')&&window.CRM&&window.CRM.nettoyer)window.CRM.depot.then(function(){window.CRM.nettoyer();});
@@ -58,5 +59,16 @@ function fin(photo){
   '<p class="note">Tu n\'as pas de note : le test sert à savoir quoi travailler.</p>';
  window.scrollTo(0,0);
 }
-accueil();
+// Arrivee par le lien de l'email : on demande a la base a qui est ce test. Lien inconnu ou deja utilise : on le dit, sans laisser repasser le test.
+function message(titre,texte){app.innerHTML='<p class="brand">Lioris</p><h1>'+titre+'</h1><p class="lead">'+texte+'</p><p class="small">Une question ? Écrivez à <a href="mailto:contact@lioris.fr">contact@lioris.fr</a>.</p>';}
+if(JETON&&window.CRM&&window.CRM.enLigne()){
+ app.innerHTML='<p class="brand">Lioris</p><p class="lead">Ouverture du test…</p>';
+ window.CRM.ouvrir(JETON).then(function(o){
+  if(!o||o.cle!==window.PACK){message('Ce lien ne correspond pas à ce test.','Reprenez le lien reçu par email, sans le modifier.');return;}
+  if(o.utilise){message('Ce test a déjà été passé.','Les réponses sont bien arrivées. Un professeur les explique pendant le rendez-vous.');return;}
+  var mot=String(o.classe||'').split(/[ ,]/)[0],c=D.classes.filter(function(x){return x[0].split(/[ ,]/)[0]===mot;})[0];
+  ins={eleve:o.prenom||'',classe:o.classe||'',qui:o.pour_soi?'moi':'enfant',niveau:c?c[1]:null};
+  niveau=D.niveaux.length===1?D.niveaux[0][0]:(ins.niveau||null);accueil();
+ },function(){message('Ce lien de test n\'est pas reconnu.','Reprenez le lien reçu par email. S\'il ne marche toujours pas, écrivez-nous.');});
+}else accueil();
 })();
