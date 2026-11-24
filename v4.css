@@ -3,7 +3,7 @@
    marge rouge ou l'on nomme l'erreur, surligneur sur les mots qui comptent. Pas de degrade, pas de carte flottante.
    Trois jeux de couleurs a comparer (attribut data-couleurs sur <html>) : cahier, tableau, marine.
    Version d'avant : site/v3.css et _archives/2026-11-22-avant-passe-cahier/ */
-@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700&family=STIX+Two+Text:ital,wght@0,400;0,500;1,400&family=Caveat:wght@500;600&display=swap");
+@import url("fonts/fonts.css");
 :root {
   --bg:#FBFBF8; --bande:#EFF2FA; --feuille:#FFFFFF; --ink:#17203A; --muted:#4A5370; --line:#D9DDEA; --trait:#C5D0EA;
   --sombre:#17203A; --sombre-ink:#F4F5FA; --sombre-muted:#B4BCD6;
