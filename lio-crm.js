@@ -27,13 +27,20 @@
    f=b.f.filter(function(x){return x.pack===r.pack&&!x.test;})[0]||(id&&trouve(b,id));
    if(!f){f={id:'f'+Date.now(),parent:r.parent||'',email:'',tel:'',eleve:r.eleve||'Élève sans inscription',classe:'',niveau:r.niveau||'',pack:r.pack,programme:'',creneau:'',contact:false,accord:false,cree:new Date().toISOString(),etat:'Inscrit',prof:'',rdv:'',test:null,journal:[]};note(f,'Fiche créée par un test passé sans inscription');b.f.unshift(f);}
    f.test=r;if(f.etat==='Inscrit')f.etat='Test passé';note(f,'Test passé');ecrire(b);
-   var id2=f.id;if(f.jeton)rpc('deposer_test',{p_jeton:f.jeton,p_niveau:r.niveau||'',p_reponses:r.reponses||{},p_redaction:!!r.redaction,p_duree_s:r.duree||0}).then(function(){window.CRM.noter(id2,'Test envoyé à la base en ligne');}).catch(function(e){window.CRM.noter(id2,'Envoi du test refusé : '+e.message);});
+   var id2=f.id;window.CRM.depot=f.jeton?rpc('deposer_test',{p_jeton:f.jeton,p_niveau:r.niveau||'',p_reponses:r.reponses||{},p_redaction:!!r.redaction,p_duree_s:r.duree||0}).then(function(){window.CRM.maj(id2,{envoye:true},'Test envoyé à la base en ligne');return true;}).catch(function(e){window.CRM.noter(id2,'Envoi du test refusé : '+e.message);return false;}):Promise.resolve(false);
    return f.id;},
   // Modifie une fiche depuis l'administration et l'ecrit au journal.
   maj:function(id,champs,texte){var b=lire(),f=trouve(b,id);if(!f)return false;Object.keys(champs).forEach(function(k){f[k]=champs[k];});if(texte)note(f,texte);return ecrire(b);},
   noter:function(id,texte){var b=lire(),f=trouve(b,id);if(!f)return false;note(f,texte);return ecrire(b);},
   retirer:function(id){var b=lire();b.f=b.f.filter(function(x){return x.id!==id;});return ecrire(b);},
-  enLigne:enLigne,attente:Promise.resolve(null),
+  enLigne:enLigne,attente:Promise.resolve(null),depot:Promise.resolve(false),
+  // Fin du parcours : une fois tous les tests arrives dans la base en ligne, on ne laisse dans ce navigateur ni l'inscription ni les reponses (ordinateur partage).
+  // On n'efface rien tant qu'une fiche n'est pas arrivee, ni le bilan d'organisation, qui n'est pas encore envoye a la base.
+  nettoyer:function(){var b=lire();if(!enLigne()||!b.f.length||b.f.some(function(x){return !(x.jeton&&x.envoye);}))return false;
+   try{var k=[],i;for(i=0;i<localStorage.length;i++)k.push(localStorage.key(i));
+    k.forEach(function(c){if(c.indexOf('lioris_')===0&&c.indexOf('lioris_bilan')!==0&&c!=='lioris_session'&&c!=='lioris_admin_mode')localStorage.removeItem(c);});
+    sessionStorage.removeItem('lioris_crm_id');}catch(e){return false;}
+   return true;},
   exporter:function(){return JSON.stringify(lire(),null,1);}
  };
 })();

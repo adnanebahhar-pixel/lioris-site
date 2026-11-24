@@ -50,6 +50,7 @@ function fin(photo){
  var RES={pack:window.PACK,niveau:niveau,eleve:ins.eleve||'',parent:ins.parent||'',duree:Math.round((Date.now()-debut)/1000),reponses:rep,redaction:aRedaction(),photo:photo,fin:new Date().toISOString()};L.ecrire('lioris_resultat',RES);if(window.CRM)window.CRM.resultat(RES);
  var file=[];try{file=JSON.parse(sessionStorage.getItem('lioris_file')||'[]');}catch(e){}
  var suivant=file.shift(),moi=ins.qui==='moi';try{sessionStorage.setItem('lioris_file',JSON.stringify(file));}catch(e){}
+ if((!suivant||suivant==='bilan')&&window.CRM&&window.CRM.nettoyer)window.CRM.depot.then(function(){window.CRM.nettoyer();});
  var lien=suivant?(suivant==='bilan'?'bilan.html?qui='+(moi?'eleve':'parent'):'test.html?pack='+suivant):'';
  app.innerHTML='<p class="brand">Lioris</p><h1>'+(suivant?'Ce test est terminé.':'C\'est terminé, merci.')+'</h1>'+
   (suivant?'<p class="lead">Il te reste '+(file.length+1)+' étape'+(file.length?'s':'')+'. Tu peux faire une pause avant de continuer.</p><p><a class="btn" href="'+lien+'">'+(suivant==='bilan'?'Passer au bilan d\'organisation':'Passer au test suivant : '+esc(window.DIAGS[suivant]?window.DIAGS[suivant].titre:suivant))+'</a></p>'
