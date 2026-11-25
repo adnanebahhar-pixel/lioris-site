@@ -5,7 +5,7 @@ place();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(place)
 // longueur réelle de chaque trait, pour que le stylo le trace en entier
 Array.prototype.forEach.call(document.querySelectorAll('.trace path'),function(p){try{p.style.setProperty('--l',Math.ceil(p.getTotalLength())+4);}catch(e){}});
 // le stylo écrit : au chargement pour le haut de page, à l'arrivée à l'écran ensuite. Une seule fois.
-var h=document.querySelector('.stylo-auto');requestAnimationFrame(function(){requestAnimationFrame(function(){h.classList.add('stylo');});});
+var h=document.querySelector('.stylo-auto');if(h)requestAnimationFrame(function(){requestAnimationFrame(function(){h.classList.add('stylo');});});
 var z=document.querySelectorAll('[data-stylo]');
 if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('stylo');io.unobserve(e.target);}});},{rootMargin:'0px 0px -10% 0px'});Array.prototype.forEach.call(z,function(x){io.observe(x);});}
 else{Array.prototype.forEach.call(z,function(x){x.classList.add('stylo');});}

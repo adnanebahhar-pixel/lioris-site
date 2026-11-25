@@ -36,7 +36,6 @@ Allow: /
 
 User-agent: *
 Allow: /
-Disallow: /admin.html
 Disallow: /inscription.html
 Disallow: /test.html
 
