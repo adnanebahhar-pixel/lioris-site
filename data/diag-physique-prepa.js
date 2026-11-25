@@ -25,7 +25,7 @@ window.DIAGS["physique-prepa"] = {
    "E"
   ],
   [
-   "Première année, MPSI ou PCSI",
+   "Première année, en cours d'année",
    "S"
   ]
  ],
@@ -346,7 +346,7 @@ window.DIAGS["physique-prepa"] = {
    "corrige": "Référentiel terrestre, supposé galiléen. Deux forces : le poids (vertical, vers le bas, de valeur m g) et la réaction du plan (perpendiculaire au plan, puisqu'il n'y a pas de frottement). Deuxième loi de Newton : m × a = poids + réaction (somme de vecteurs). En projection sur l'axe du plan orienté vers le bas, la réaction ne compte pas et il reste m a = m g sin α, donc a = g sin α = 10 × 0,50 = 5,0 m/s². L'accélération est constante et la vitesse initiale est nulle : v(t) = g sin α × t et x(t) = ½ g sin α × t². Le palet a parcouru L quand t = √(2L/(g sin α)) = √(5,0/5,0) = 1,0 s. Sa vitesse vaut alors v = g sin α × t = 5,0 m/s. Homogénéité : L/g s'exprime en m/(m/s²) = s², et sin α n'a pas de dimension, donc la racine est bien une durée. La masse n'apparaît pas dans le résultat : sans frottement, tous les palets descendent en la même durée, comme pour une chute libre."
   },
   "S": {
-   "titre": "premier semestre de MPSI ou de PCSI",
+   "titre": "premier semestre de prépa",
    "questions": [
     {
      "id": "S1",

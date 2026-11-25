@@ -17,11 +17,7 @@ window.DIAGS["maths-prepa"] = {
    "C"
   ],
   [
-   "Première année, MPSI",
-   "C"
-  ],
-  [
-   "Première année, PCSI",
+   "Première année de prépa",
    "C"
   ]
  ],

@@ -6,8 +6,8 @@ var PACKS=[window.PACK].concat(SUITE),NOMS=PACKS.map(function(k){return window.D
 var plusieurs=PACKS.length>1,dureeTxt=plusieurs?'un par matière':'environ '+L.esc(D.duree);
 var h='<p class="brand">Lioris</p><h1>'+(plusieurs?'Vos '+PACKS.length+' tests':L.esc(D.titre))+' : gratuit</h1>'+
  (plusieurs?'<p class="note">'+NOMS.map(L.esc).join(' · ')+'</p>':'')+
- '<p class="lead">'+(MOI?'Vous passez '+(plusieurs?'les tests, ':'le test, ')+dureeTxt+'. Vous recevez la carte des erreurs par écrit. Un professeur vous l\'explique en visio et, si c\'est utile, vous propose un programme. Vous êtes libre de ne pas donner suite.'
-   :'Vous inscrivez votre enfant. Il passe '+(plusieurs?'les tests, ':'le test, ')+dureeTxt+'. Vous recevez la carte des erreurs par écrit. Un professeur vous l\'explique en visio et, si c\'est utile, vous propose un programme. Vous êtes libre de ne pas donner suite.')+'</p>'+
+ '<p class="lead">'+(MOI?'Vous passez '+(plusieurs?'les tests, ':'le test, ')+dureeTxt+'. Vous retrouvez la carte des erreurs sur votre page personnelle. Un professeur vous l\'explique en visio et, si c\'est utile, vous propose un programme. Vous êtes libre de ne pas donner suite.'
+   :'Vous inscrivez votre enfant. Il passe '+(plusieurs?'les tests, ':'le test, ')+dureeTxt+'. Vous retrouvez la carte des erreurs sur votre page personnelle. Un professeur vous l\'explique en visio et, si c\'est utile, vous propose un programme. Vous êtes libre de ne pas donner suite.')+'</p>'+
  '<form id="f"><label for="pp">Votre prénom</label><input id="pp" type="text" required autocomplete="given-name">'+
  '<label for="em">Votre email</label><input id="em" type="email" required autocomplete="email">'+
  '<label for="tel">Votre téléphone</label><input id="tel" type="tel" autocomplete="tel">'+

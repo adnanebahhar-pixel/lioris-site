@@ -3,7 +3,7 @@ window.DIAGS["physique-chimie"] = {
  "cle": "physique-chimie",
  "matiere": "physique-chimie",
  "titre": "Test de physique-chimie",
- "nom": "Diagnostic de physique-chimie",
+ "nom": "Test de physique-chimie",
  "commun": "M",
  "niveaux": [
   [

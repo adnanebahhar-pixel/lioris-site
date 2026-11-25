@@ -3,7 +3,7 @@ window.DIAGS["maths-premiere-terminale"] = {
  "cle": "maths-premiere-terminale",
  "matiere": "maths",
  "titre": "Test de maths",
- "nom": "Diagnostic de spécialité maths",
+ "nom": "Test de spécialité maths",
  "commun": "A",
  "niveaux": [
   [

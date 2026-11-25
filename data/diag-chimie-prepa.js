@@ -25,7 +25,7 @@ window.DIAGS["chimie-prepa"] = {
    "E"
   ],
   [
-   "Première année, MPSI ou PCSI",
+   "Première année, en cours d'année",
    "S"
   ]
  ],
@@ -364,7 +364,7 @@ window.DIAGS["chimie-prepa"] = {
    "corrige": "CH3COOH(aq) + H2O(l) ⇌ CH3COO−(aq) + H3O+(aq). Pour V = 1,0 L : au départ 0,10 mol d'acide ; à l'état final 0,10 − xf mol d'acide, xf mol d'ions éthanoate et xf mol d'ions H3O+ (l'eau est le solvant, en excès). xf = [H3O+] × V = 10^(−2,9) × 1,0 = 1,3 × 10^(−3) mol, et xmax = 0,10 mol. Taux d'avancement final : xf/xmax = 1,3 × 10^(−3)/0,10 = 1,3 %. Il est très inférieur à 100 % : la réaction n'est pas totale, l'acide est faible. Ka = [CH3COO−] × [H3O+]/[CH3COOH] = (1,3 × 10^(−3))²/(0,10 − 0,0013) ≈ 1,7 × 10^(−6)/0,10 = 1,7 × 10^(−5). C'est le même ordre de grandeur que la valeur attendue 1,6 × 10^(−5) : l'écart vient de la précision de la mesure du pH, donnée à un seul chiffre après la virgule."
   },
   "S": {
-   "titre": "premier semestre de MPSI ou de PCSI",
+   "titre": "premier semestre de prépa",
    "questions": [
     {
      "id": "S1",

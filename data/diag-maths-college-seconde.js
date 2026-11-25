@@ -3,7 +3,7 @@ window.DIAGS["maths-college-seconde"] = {
  "cle": "maths-college-seconde",
  "matiere": "maths",
  "titre": "Test de maths",
- "nom": "Diagnostic des bases en maths",
+ "nom": "Test des bases en maths",
  "commun": "A",
  "niveaux": [
   [

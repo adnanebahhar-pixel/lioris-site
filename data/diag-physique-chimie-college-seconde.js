@@ -3,7 +3,7 @@ window.DIAGS["physique-chimie-college-seconde"] = {
  "cle": "physique-chimie-college-seconde",
  "matiere": "physique-chimie",
  "titre": "Test de physique-chimie",
- "nom": "Diagnostic de physique-chimie, collège et seconde",
+ "nom": "Test de physique-chimie, collège et seconde",
  "commun": "M",
  "niveaux": [
   [
