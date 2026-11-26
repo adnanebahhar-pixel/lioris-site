@@ -48,18 +48,42 @@ function journal(fid,t){return api('POST','journal',{famille_id:fid,auteur_id:SE
 function tri(c,inv){return function(a,b){return (a[c]||'')<(b[c]||'')?(inv?1:-1):(a[c]||'')>(b[c]||'')?(inv?-1:1):0;};}
 function charger(){var d0=new Date(Date.now()-200*JOUR).toISOString().slice(0,10);
  return api('GET','profils?select=role&id=eq.'+SES.uid).then(function(pr){if(!pr||!pr[0]||pr[0].role!=='admin')throw new Error('droit');
-  return Promise.all([api('GET','familles?select=*,eleves(*,tests(*),rendez_vous(*),jetons(jeton,cle,utilise),commandes(*),programmes(*,seances(*),rapports(*))),journal(*)&order=cree_le.desc'),
+  return Promise.all([api('GET','familles?select=*,eleves(*,tests(*),rendez_vous(*),jetons(*),commandes(*),programmes(*,seances(*),rapports(*))),journal(*)&order=cree_le.desc'),
    api('GET','professeurs?select=*&order=prenom'),api('GET','liens?select=*&order=cree_le.desc'),api('GET','demandes?select=*&order=cree_le.desc'),tout('visites?select=*&jour=gte.'+d0+'&order=jour.desc'),
    api('GET','seo_releves?select=*&order=releve_le.desc,id.desc'),api('GET','geo_releves?select=*&order=releve_le.desc,id.desc&limit=600'),api('GET','actions?select=*&order=quand.desc&limit=80'),api('GET','reglages?select=*'),api('GET','articles?select=*&order=cree_le.desc&limit=500').catch(function(){return null;}),api('GET','machine_acces?select=*&order=cree_le.desc').catch(function(){return null;})]);})
  .then(function(r){D={fam:r[0]||[],prof:r[1]||[],liens:r[2]||[],dem:r[3]||[],vis:r[4]||[],seo:r[5]||[],geo:r[6]||[],act:r[7]||[],reg:{},el:[],cmd:[],prog:[],sea:[]};
   (r[8]||[]).forEach(function(x){D.reg[x.cle]=x.valeur;});D.art=r[9];D.mac=r[10]||[];
-  D.fam.forEach(function(f){f.journal=(f.journal||[]).sort(tri('quand',1));(f.eleves||[]).forEach(function(e){e.fam=f;e.tests=(e.tests||[]).sort(tri('passe_le',1));e.rdv=(e.rendez_vous||[]).sort(tri('cree_le',1))[0]||null;
-   e.rdvs=(e.rendez_vous||[]);e.aPasser=(e.jetons||[]).filter(function(j){return !j.utilise;});e.attendus=e.aPasser.map(function(j){return titreTest(j.cle);});e.cles=(e.jetons||[]).map(function(j){return j.cle;});
+  D.fam.forEach(function(f){f.journal=(f.journal||[]).sort(tri('quand',1));(f.eleves||[]).forEach(function(e){e.fam=f;var TT=(e.tests||[]).sort(tri('passe_le',1));e.courts=TT.filter(estCourt);e.tests=TT.filter(function(t){return !estCourt(t);});e.jc=(e.jetons||[]).filter(estCourt);e.rdv=(e.rendez_vous||[]).sort(tri('cree_le',1))[0]||null;
+   e.rdvs=(e.rendez_vous||[]);e.aPasser=(e.jetons||[]).filter(function(j){return !j.utilise&&!estCourt(j);});e.attendus=e.aPasser.map(function(j){return titreTest(j.cle);});e.cles=(e.jetons||[]).map(function(j){return j.cle;});
    e.commandes=(e.commandes||[]).sort(tri('cree_le',1));e.commandes.forEach(function(c){c.el=e;D.cmd.push(c);});
    e.programmes=(e.programmes||[]).sort(tri('debut',1));e.programmes.forEach(function(g){g.el=e;g.seances=(g.seances||[]).sort(tri('quand'));g.rapports=g.rapports||[];D.prog.push(g);g.seances.forEach(function(s){s.prog=g;D.sea.push(s);});});
    D.el.push(e);});});
   D.cmd.sort(tri('cree_le',1));D.sea.sort(tri('quand'));});}
 function el(id){return D.el.filter(function(x){return x.id===id;})[0];}
+// ---------- tests courts des semaines 6 et 12 : une douzaine de questions du test d'entree, les erreurs d'abord (2026-11-26)
+var SEMS=['6','12'],NB_COURT=12;
+function estCourt(x){return !!x.type&&x.type!=='entree';}
+function semaine(x){return String(x.type||'').split('-')[1]||'';}
+// Les reponses connues d'un eleve a un test : celles du test d'entree, remplacees par celles des tests courts deja passes.
+function reponsesAJour(e,t,avant){var R={},k;for(k in (t.reponses||{}))R[k]=t.reponses[k];e.courts.filter(function(c){return c.cle===t.cle&&(!avant||c.passe_le<avant);}).sort(tri('passe_le')).forEach(function(c){for(var q in (c.reponses||{}))R[q]=c.reponses[q];});return R;}
+// Le choix des questions : d'abord celles qu'il rate encore, puis « je ne sais pas », puis « pas encore vu », puis celles qu'il a reussies
+// seulement au test court (a confirmer), puis les autres. Dans chaque groupe, l'ordre du test.
+function choixCourt(e,t){var D0=window.DIAGS&&Object.prototype.hasOwnProperty.call(window.DIAGS,t.cle)?window.DIAGS[t.cle]:null;if(!D0||!D0.blocs)return [];
+ var R=reponsesAJour(e,t),R0=t.reponses||{},L=[],n=0;
+ [D0.commun,t.niveau].forEach(function(b,ib){if(!b||!D0.blocs[b]||(ib===1&&b===D0.commun))return;D0.blocs[b].questions.forEach(function(q){var x=R[q.id],x0=R0[q.id];if(!x)return;
+  var r=/^bad\d+$/.test(x.k)?0:x.k==='nsp'?1:x.k==='pasvu'?2:(x0&&x0.k!=='ok')?3:4;L.push([r,n++,q.id]);});});
+ return L.sort(function(a,b){return (a[0]-b[0])||(a[1]-b[1]);}).slice(0,NB_COURT).map(function(x){return x[2];});}
+function bilanCourt(e,t,c){var A=reponsesAJour(e,t,c.passe_le),o={n:0,reglees:0,restent:0,nouvelles:0};Object.keys(c.reponses||{}).forEach(function(id){var a=A[id],b=c.reponses[id];o.n++;var okA=!!a&&a.k==='ok',okB=b.k==='ok';if(!okA&&okB)o.reglees++;else if(!okA&&!okB)o.restent++;else if(okA&&!okB)o.nouvelles++;});return o;}
+function lienTest(j){return ici()+'test.html?pack='+encodeURIComponent(j.cle)+'&j='+encodeURIComponent(j.jeton);}
+function blocCourts(e){if(!e.tests.length)return '';var f=e.fam,faites=0;e.programmes.forEach(function(g){if(!g.arrete_le)faites=Math.max(faites,g.seances.filter(function(s){return s.etat==='faite';}).length);});
+ var o='<div class="bloc"><h2>Tests courts des semaines 6 et 12</h2><p class="petit" style="margin:0 0 12px">Une douzaine de questions du test d\'entrée, ses erreurs d\'abord. Le résultat trace une seconde fois la toile sur la page du parent. '+(e.programmes.length?faites+' séance'+(faites>1?'s':'')+' faite'+(faites>1?'s':'')+' à ce jour.':'Ils s\'envoient pendant le programme.')+'</p>';
+ var vus={};e.tests.forEach(function(t){if(vus[t.cle])return;vus[t.cle]=1;o+='<h3>'+h(titreTest(t.cle))+'</h3>';
+  SEMS.forEach(function(s){var ty='court-'+s,c=e.courts.filter(function(x){return x.cle===t.cle&&x.type===ty;})[0],j=e.jc.filter(function(x){return x.cle===t.cle&&x.type===ty&&!x.utilise;})[0];
+   if(c){var b=bilanCourt(e,t,c);o+='<p style="margin:0 0 10px"><b>Semaine '+s+'</b> '+tag('passé le '+jour(c.passe_le,1),'v')+'<br><span class="petit">'+b.n+' questions reprises : '+b.reglees+' erreur'+(b.reglees>1?'s':'')+' réglée'+(b.reglees>1?'s':'')+', '+b.restent+' encore à travailler'+(b.nouvelles?', '+b.nouvelles+' à revoir':'')+'.</span></p>';return;}
+   if(j){o+='<p style="margin:0 0 4px"><b>Semaine '+s+'</b> '+tag('envoyé, pas encore passé','j')+' <span class="petit">'+(j.envoye_le?'email parti le '+jour(j.envoye_le):'créé le '+jour(j.cree_le)+(f.email?', email en cours d\'envoi':', aucun email sur la fiche'))+(j.rappels?' · '+j.rappels+' rappel'+(j.rappels>1?'s':'')+', le dernier le '+jour(j.rappel_le):'')+'</span></p><div class="lien-b" style="margin:0 0 8px"><input type="text" readonly value="'+h(lienTest(j))+'" aria-label="Lien du test court" id="tc-'+j.jeton+'"><span><button type="button" class="act" data-a="copie" data-id="tc-'+j.jeton+'">Copier</button></span></div><p style="margin:0 0 12px">'+(f.email?'<button type="button" class="act plein" data-a="court-rappel" data-id="'+j.jeton+'">Envoyer un rappel à '+h(f.email)+'</button>':'<span class="petit">Copiez le lien et envoyez-le par message.</span>')+'</p>';return;}
+   var ids=choixCourt(e,t);
+   o+='<p style="margin:0 0 12px"><b>Semaine '+s+'</b> '+(ids.length?'<button type="button" class="act'+(e.programmes.length&&faites>=+s?' plein':'')+'" data-a="court-cree" data-id="'+e.id+'" data-t="'+h(t.id)+'" data-s="'+s+'">Envoyer le test court'+(f.email?' à '+h(f.email):' (le lien s\'affichera ici)')+'</button> <span class="petit">'+ids.length+' questions.</span>':'<span class="petit">Ce test n\'a pas de questions à reprendre.</span>')+'</p>';});});
+ return o+'<p class="msg" id="tc-msg" aria-live="polite"></p></div>';}
 function prof(id){return D.prof.filter(function(x){return x.id===id;})[0];}
 function nomProf(id){var p=prof(id);return p?p.prenom+(p.nom?' '+p.nom:''):'';}
 function optsProf(sel){return '<option value="">à attribuer</option>'+D.prof.filter(function(p){return p.actif||p.id===sel;}).map(function(p){return '<option value="'+p.id+'"'+(p.id===sel?' selected':'')+'>'+h(nomProf(p.id))+'</option>';}).join('');}
@@ -98,6 +122,10 @@ function afaire(){var l=[],now=Date.now();
   if(s.etat==='faite'&&!s.compte_rendu&&q<now-JOUR)l.push(['','Compte rendu en retard : '+e.prenom,'Séance du '+jour(s.quand)+' · '+nomProf(s.prog.professeur_ref),'Ouvrir','seance',s.id]);
   if(s.etat==='reportée')l.push(['j','Séance reportée sans nouvelle date : '+e.prenom,'Était prévue '+jour(s.quand)+'. Donner la nouvelle date et la remettre à « prévue ».','Ouvrir','seance',s.id]);
   if(s.etat==='manquée'&&q>now-7*JOUR)l.push(['','Séance manquée : '+e.prenom,jour(s.quand)+'. Règle : parent prévenu dans les 10 minutes.','Ouvrir','seance',s.id]);});
+ D.el.forEach(function(e){if(!e.tests.length)return;var faites=0,total=0;e.programmes.forEach(function(g){if(g.arrete_le)return;var n=g.seances.filter(function(s){return s.etat==='faite';}).length;if(n>=faites){faites=n;total=g.seances_total||g.seances.length;}});
+  SEMS.forEach(function(s){var ty='court-'+s,fait=e.courts.some(function(c){return c.type===ty;}),j=e.jc.filter(function(x){return x.type===ty&&!x.utilise;})[0];
+   if(!fait&&!j&&total&&faites>=Math.min(+s,total))l.push(['v','Envoyer le test court de la semaine '+s+' : '+e.prenom,faites+' séances faites. Un clic l\'envoie à la famille.','Envoyer','fiche',e.id]);
+   if(j&&heures(j.rappel_le||j.envoye_le||j.cree_le)>72)l.push(['j','Test court de la semaine '+s+' non passé : '+e.prenom,'Envoyé '+jour(j.envoye_le||j.cree_le)+(j.rappels?' · '+j.rappels+' rappel'+(j.rappels>1?'s':''):'')+'. Un clic envoie un rappel.','Relancer','fiche',e.id]);});});
  D.prog.forEach(function(g){if(g.arrete_le)return;var f=g.seances.filter(function(s){return s.etat==='faite';}).length;
   if(f>=10&&f<g.seances_total)l.push(['v','Proposer la suite à la famille de '+g.el.prenom,f+' séances faites sur '+g.seances_total+'. Règle : proposition en semaine 10.','Ouvrir','fiche',g.el.id]);});
  return l;}
@@ -189,6 +217,7 @@ V.fiche=function(id){var e=el(id);if(!e)return V.familles();var f=e.fam,r=e.rdv|
  o+=plier('Paiement'+(paye?' · payé':e.commandes.length?' · '+h(e.commandes[0].statut==='lien créé'&&heures(e.commandes[0].cree_le)>24?'lien expiré':e.commandes[0].statut):''),rf&&!paye,blocPaiement(e))+plier('Programme et séances'+(e.programmes.length?' · '+e.programmes.length:''),paye||e.programmes.length>0,blocProgramme(e))+'</div><div>';
  o+='<div class="bloc"><h2>Liens personnels</h2>'+blocLien('parent',f.id,'Page du parent','Résultats, rendez-vous, séances, comptes rendus, rapports, paiements de la famille.')+blocLien('eleve',e.id,'Page de l\'élève','Ses séances et son travail à faire.')+'</div>';
  e.tests.forEach(function(t){var L=lecture(t);o+='<div class="bloc"><h2>'+h(L.titre)+'</h2><p style="margin:0"><b>'+L.ok+' bonnes réponses sur '+L.total+'</b>'+(L.sans?' · '+L.sans+' sans réponse':'')+' · passé le '+jour(t.passe_le)+(t.duree_s?' en '+Math.round(t.duree_s/60)+' min':'')+'</p>'+(L.erreurs.length?'<ul class="err-l">'+L.erreurs.map(function(x){return '<li><small>'+h(x.id)+' · '+h(x.bloc)+'</small>'+fmt(x.q)+'<small>A répondu : '+fmt(x.rep)+'</small><b>'+fmt(x.err)+'</b></li>';}).join('')+'</ul>':'<p class="petit" style="margin:8px 0 0">Aucune erreur parmi les réponses données.</p>')+'</div>';});
+ o+=blocCourts(e);
  o+='<div class="bloc"><h2>'+(e.tests.length?'Tests encore à passer':'Test à passer')+'</h2>'+blocTestLien(e)+'</div>';
  o+='<div class="bloc"><h2>Journal</h2>'+(f.journal.length?'<ul class="fil">'+f.journal.map(function(j){return '<li>'+h(j.texte)+'<small>'+jour(j.quand)+'</small></li>';}).join('')+'</ul>':'<p class="petit" style="margin:0">Rien pour le moment.</p>')+'</div></div></div>';return o;};
 V.ajout=function(){
@@ -407,6 +436,11 @@ var ACT={
  'art-rythme':function(){var r=regMachine();r.par_semaine=+val('ar-rythme');regEcrire(r,'Machine SEO : '+r.par_semaine+' page(s) par semaine au plus');},
  'art-acces-cree':function(t){t.disabled=true;api('POST','machine_acces',{}).then(function(){return noter('Accès de la machine SEO créé');}).then(function(){return refaire();}).catch(echec);},
  'art-acces-coupe':function(t){if(!t.getAttribute('data-sur')){t.setAttribute('data-sur','1');t.textContent='Confirmer : la machine ne pourra plus rien publier';return;}t.disabled=true;api('PATCH','machine_acces?jeton=eq.'+t.getAttribute('data-id'),{actif:false}).then(function(){return noter('Accès de la machine SEO coupé');}).then(function(){return refaire();}).catch(echec);},
+ // Test court : la creation du lien suffit, la base envoie l'email (declencheur jetons_test_court). Le rappel : une date de rappel, la base renvoie l'email.
+ 'court-cree':function(t){var e=el(t.getAttribute('data-id')),tt=e&&e.tests.filter(function(x){return String(x.id)===t.getAttribute('data-t');})[0],s=t.getAttribute('data-s'),m=document.getElementById('tc-msg');if(!tt)return;var ids=choixCourt(e,tt);if(!ids.length)return;t.disabled=true;
+  api('POST','jetons',{eleve_id:e.id,cle:tt.cle,type:'court-'+s,niveau:tt.niveau||null,questions:ids}).then(function(){return journal(e.fam.id,'Test court de la semaine '+s+' créé pour '+e.prenom+' ('+ids.length+' questions)'+(e.fam.email?', email demandé':', sans email : lien à envoyer par message'));}).then(function(){return refaire();}).then(function(){var m2=document.getElementById('tc-msg');if(m2){m2.textContent=e.fam.email?'Test court créé. L\'email part dans la minute à '+e.fam.email+'.':'Test court créé. Copiez le lien et envoyez-le par message.';m2.style.color='#1B5E36';}}).catch(function(x){t.disabled=false;if(m)m.textContent='Refusé : '+String(x.message).slice(0,180);});},
+ 'court-rappel':function(t){var id=t.getAttribute('data-id'),j=null,e=null;D.el.forEach(function(x){x.jc.forEach(function(y){if(y.jeton===id){j=y;e=x;}});});if(!j)return;t.disabled=true;
+  api('PATCH','jetons?jeton=eq.'+id,{rappel_le:new Date().toISOString(),rappels:(j.rappels||0)+1}).then(function(){return journal(e.fam.id,'Rappel du test court de la semaine '+semaine(j)+' demandé pour '+e.prenom);}).then(function(){return refaire();}).then(function(){var m2=document.getElementById('tc-msg');if(m2){m2.textContent='Rappel demandé. L\'email part dans la minute.';m2.style.color='#1B5E36';}}).catch(echec);},
  'dem-rouvre':function(t){t.disabled=true;api('PATCH','demandes?id=eq.'+t.getAttribute('data-id'),{traite:false}).then(function(){return noter('Demande rouverte');}).then(function(){return refaire();}).catch(echec);},
  'act-traite':function(t){var a=D.act.filter(function(x){return String(x.id)===t.getAttribute('data-id');})[0];if(!a)return;t.disabled=true;api('PATCH','actions?id=eq.'+a.id,{texte:'Traité · '+a.texte}).then(function(){return refaire();}).catch(echec);},
  'rap-email':function(t){t.disabled=true;api('PATCH','rapports?id=eq.'+t.getAttribute('data-id'),{email_le:null}).then(function(){return refaire('Envoi de l\'email demandé. Il part dans la minute ; le journal de la famille le confirme.');}).catch(echec);},

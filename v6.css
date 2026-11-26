@@ -321,6 +321,7 @@ footer nav { display:flex; flex-wrap:wrap; gap:6px 24px; }
   .annot svg { margin-left:0; }
   .haut { height:76px; gap:18px; }
   .haut a.l { display:none; }
+  .haut a.l.blog { display:inline-block; padding:12px 0; }   /* le blog reste visible sur telephone */
   .logo { font-size:26px; }
   h1 { line-height:.95; }
   .hero-bas, .deux, .fin .col { grid-template-columns:minmax(0, 1fr); }

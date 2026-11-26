@@ -5,6 +5,7 @@
 .t6 .maquette { background:var(--ink); color:#C9D0E6; font:500 13px/20px var(--texte); text-align:center; padding:6px 16px; position:relative; z-index:2; }
 .t6 .haut { height:88px; }
 .t6 .logo { margin-right:auto; }
+.t6 [hidden] { display:none !important; }
 .t6 .t-page { max-width:760px; padding:8px 0 160px; }
 .t6 h1, .t6 h2 { margin-left:0; }
 .t6 p { max-width:34em; }

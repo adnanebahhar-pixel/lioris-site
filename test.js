@@ -16,28 +16,35 @@ function enCours(){try{var s=JSON.parse(localStorage.getItem(ENC)||'null');if(!s
   var L=s.ordre.map(function(x){var q=par[x.id];if(!q)return null;var o=x.o.map(function(k){if(k==='ok')return {t:q.ok,k:k};var n=+String(k).slice(3);return q.bad[n]===undefined?null:{t:q.bad[n],k:k};});return o.indexOf(null)>=0||o.length!==q.bad.length+1?null:{q:q,commun:!!x.c,opts:o};});
   if(L.indexOf(null)>=0)return null;s.liste=L;s.i=Math.max(0,Math.min(L.length-1,s.i|0));return s;}catch(e){return null;}}
 function melange(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1));var x=a[k];a[k]=a[j];a[j]=x;}return a;}
-function aRedaction(){return !!(niveau&&D.blocs[niveau].redaction);}
+// Test court des semaines 6 et 12 (2026-11-26) : meme ecran, mais une douzaine de questions du test d'entree, choisies par l'administration
+// (COURT.ids), sans exercice a rediger. Il n'arrive que par un lien recu par email.
+var COURT=null;
+function parId(){var par={};[D.commun,niveau].forEach(function(b){if(b&&D.blocs[b])D.blocs[b].questions.forEach(function(q){par[q.id]={q:q,commun:b===D.commun&&b!==niveau};});});return par;}
+function aRedaction(){return !COURT&&!!(niveau&&D.blocs[niveau].redaction);}
 function accueil(){
  var avecRed=Object.keys(D.blocs).some(function(k){return D.blocs[k].redaction;});
- var nb=niveau?((D.commun?D.blocs[D.commun].questions.length:0)+D.blocs[niveau].questions.length):0;
+ var plein=niveau?((D.commun?D.blocs[D.commun].questions.length:0)+D.blocs[niveau].questions.length):0,nb=COURT?COURT.ids.length:plein;
+ var dureeTxt=COURT?Math.max(5,Math.round((parseInt(D.duree,10)||30)*nb/(plein||nb||1)))+' min':String(D.duree).replace(/\s*minutes?/,' min');
  var classe=ins.classe||'';if(!classe&&niveau){var cc=D.classes.filter(function(c){return c[1]===niveau;})[0];classe=cc?cc[0]:'';}
  var moi=ins.qui==='moi';
- app.innerHTML='<header class="t-couv"><p class="etiquette">Test gratuit'+(classe?'. '+esc(classe)+'.':'.')+'</p>'+
+ app.innerHTML='<header class="t-couv"><p class="etiquette">'+(COURT?'Test court. Semaine '+COURT.sem+'.':'Test gratuit'+(classe?'. '+esc(classe)+'.':'.'))+'</p>'+
   '<h1 class="t-titre">'+esc(D.titre)+'</h1>'+
   (ins.eleve?'<p class="t-nom"><span>Nom</span><span class="eleve">'+esc(ins.eleve)+'</span></p>':'')+
-  '<ul class="t-faits">'+(nb?'<li><b>'+nb+'</b>questions</li>':'')+'<li><b>'+esc(String(D.duree).replace(/\s*minutes?/,' min'))+'</b>environ</li><li><b>Aucune</b>note</li></ul>'+
-  '<p class="t-but">Ce test repère ce qu\'il faut travailler, et dans quel ordre.</p><p class="t-mot" aria-hidden="true">Ce n\'est pas une note.</p><span class="evite">Ce n\'est pas une note.</span></header>'+
+  '<ul class="t-faits">'+(nb?'<li><b>'+nb+'</b>questions</li>':'')+'<li><b>'+esc(dureeTxt)+'</b>environ</li><li><b>Aucune</b>note</li></ul>'+
+  '<p class="t-but">'+(COURT?'Ce test reprend des questions de ton test d\'entrée, pour voir ce qui est réglé et ce qui reste à travailler.':'Ce test repère ce qu\'il faut travailler, et dans quel ordre.')+'</p><p class="t-mot" aria-hidden="true">Ce n\'est pas une note.</p><span class="evite">Ce n\'est pas une note.</span></header>'+
  '<h2 class="t-h2">Avant de commencer</h2>'+
  '<ul class="t-regles"><li><i>1</i><span><b>Calcule au brouillon avant de répondre.</b> '+esc(D.calculatrice)+'</span></li>'+
   '<li><i>2</i><span><b>Ne réponds pas au hasard.</b> « Je ne sais pas » nous aide plus qu\'un coup de chance.</span></li>'+
   '<li><i>3</i><span><b>Des questions à choix'+(avecRed?', puis un court exercice à rédiger sur papier':'')+'.</b> Tu peux revenir en arrière à tout moment.</span></li></ul>'+
- '<ol class="t-suite"><li class="ici"><b>Le test</b><span>maintenant</span></li><li><b>Le rendez-vous</b><span>'+(moi?'un professeur t\'explique tes réponses':'un professeur explique tes réponses à ton parent')+'</span></li><li><b>Le plan écrit</b><span>ce qu\'il faut reprendre, dans l\'ordre</span></li></ol>'+
+ (COURT?'<p class="t-note" style="margin:0 0 32px">Ton professeur regarde tes réponses avant la prochaine séance.</p>':'')+
+ '<ol class="t-suite"'+(COURT?' hidden':'')+'><li class="ici"><b>Le test</b><span>maintenant</span></li><li><b>Le rendez-vous</b><span>'+(moi?'un professeur t\'explique tes réponses':'un professeur explique tes réponses à ton parent')+'</span></li><li><b>Le plan écrit</b><span>ce qu\'il faut reprendre, dans l\'ordre</span></li></ol>'+
  (function(){var s=enCours();return s?'<div class="t-reprise"><p><b>Tu avais commencé ce test.</b> Tes réponses sont gardées : tu en étais à la question '+(s.i+1)+' sur '+s.liste.length+'.</p><p class="t-go" style="margin:0"><button class="btn" id="reprendre">Reprendre où j\'en étais</button></p></div>':'';})()+
  (niveau?'':'<label for="nv">Ta classe</label><select id="nv">'+D.classes.map(function(c){return '<option value="'+c[1]+'">'+esc(c[0])+'</option>';}).join('')+'</select>')+
  '<p class="t-go"><button class="btn'+(enCours()?' ghost':'')+'" id="go">'+(enCours()?'Recommencer depuis le début':'Commencer le test')+'</button></p>';
  var rp=document.getElementById('reprendre');if(rp)rp.onclick=function(){var s=enCours();if(!s)return;niveau=s.niveau;liste=s.liste;rep=s.rep||{};i=s.i;prec=i;debut=s.debut;if(s.etape==='red'&&aRedaction())redaction();else question();};
  document.getElementById('go').onclick=function(){if(!niveau)niveau=document.getElementById('nv').value;
   var qs=(D.commun?D.blocs[D.commun].questions.map(function(q){return {q:q,commun:true};}):[]).concat(D.blocs[niveau].questions.map(function(q){return {q:q,commun:false};}));
+  if(COURT){var par=parId();qs=COURT.ids.map(function(id){return par[id];}).filter(Boolean);}
   liste=qs.map(function(x){var q=x.q,o=[{t:q.ok,k:'ok'}].concat(q.bad.map(function(b,n){return {t:b,k:'bad'+n};}));return {q:q,commun:x.commun,opts:melange(o)};});
   debut=Date.now();i=0;rep={};question();};
 }
@@ -102,16 +109,16 @@ function echec(r){
 }
 function termine(){
  var file=[];try{file=JSON.parse(sessionStorage.getItem('lioris_file')||'[]');}catch(e){}
- file=file.filter(function(k){return window.DIAGS[k];});var suivant=file.shift(),moi=ins.qui==='moi';try{sessionStorage.setItem('lioris_file',JSON.stringify(file));}catch(e){}
+ file=file.filter(function(k){return window.DIAGS[k];});var suivant=COURT?null:file.shift(),moi=ins.qui==='moi';try{sessionStorage.setItem('lioris_file',JSON.stringify(file));}catch(e){}
  if(!suivant&&window.CRM&&window.CRM.nettoyer)window.CRM.depot.then(function(){window.CRM.nettoyer();});
  var lien=suivant?'test.html?pack='+suivant:'';
  app.innerHTML='<div class="t-fin"><span class="t-ok" aria-hidden="true"><svg viewBox="0 0 54 40"><path pathLength="1" d="M4 22 L18 36 L50 4"/></svg></span>'+
   '<h1>'+(suivant?'Ce test est terminé.':'C\'est terminé, merci.')+'</h1>'+
-  '<p class="lead">'+(suivant?'Tes réponses sont enregistrées. Il te reste '+(file.length+1)+' étape'+(file.length?'s':'')+' : tu peux faire une pause avant de continuer.':'Tes réponses sont enregistrées. Tu n\'as pas de note : le test sert à savoir quoi travailler.')+'</p></div>'+
+  '<p class="lead">'+(COURT?'Tes réponses sont enregistrées. Ton professeur les regarde avant la prochaine séance. Tu n\'as pas de note.':suivant?'Tes réponses sont enregistrées. Il te reste '+(file.length+1)+' étape'+(file.length?'s':'')+' : tu peux faire une pause avant de continuer.':'Tes réponses sont enregistrées. Tu n\'as pas de note : le test sert à savoir quoi travailler.')+'</p></div>'+
   (suivant?'<p class="t-go" style="margin:0 0 64px"><a class="btn" href="'+lien+'">'+('Passer au test suivant : '+esc(window.DIAGS[suivant].titre))+'</a></p>':'')+
-  '<h2 class="t-h2">Ce qui se passe maintenant</h2>'+
-  '<ol class="t-suite"><li class="fait"><b>Le test</b><span>fait</span></li><li class="ici"><b>Le rendez-vous</b><span>'+(moi?'un professeur t\'explique tes réponses en visio':'un professeur explique tes réponses à ton parent, en visio')+'</span></li><li><b>Le plan écrit</b><span>ce qu\'il faut reprendre, dans l\'ordre</span></li></ol>'+
-  (suivant?'':'<p class="t-note">'+(moi?'Tu reçois un email avec la date et l\'heure du rendez-vous.':'Ton parent reçoit un email avec la date et l\'heure du rendez-vous.')+'</p>')+
+  '<h2 class="t-h2"'+(COURT?' hidden':'')+'>Ce qui se passe maintenant</h2>'+
+  '<ol class="t-suite"'+(COURT?' hidden':'')+'><li class="fait"><b>Le test</b><span>fait</span></li><li class="ici"><b>Le rendez-vous</b><span>'+(moi?'un professeur t\'explique tes réponses en visio':'un professeur explique tes réponses à ton parent, en visio')+'</span></li><li><b>Le plan écrit</b><span>ce qu\'il faut reprendre, dans l\'ordre</span></li></ol>'+
+  (suivant||COURT?'':'<p class="t-note">'+(moi?'Tu reçois un email avec la date et l\'heure du rendez-vous.':'Ton parent reçoit un email avec la date et l\'heure du rendez-vous.')+'</p>')+
   '';
  window.scrollTo(0,0);
 }
@@ -124,7 +131,13 @@ if(JETON&&window.CRM&&window.CRM.enLigne()){
   if(o.utilise){message('Ce test a déjà été passé.','Les réponses sont bien arrivées. Un professeur les explique pendant le rendez-vous.');return;}
   var nomc=String(o.classe||''),mot=nomc.split(/[ ,]/)[0],c=D.classes.filter(function(x){return x[0]===nomc;})[0]||D.classes.filter(function(x){return x[0].split(/[ ,]/)[0]===mot;})[0];
   ins={eleve:o.prenom||'',classe:o.classe||'',qui:o.pour_soi?'moi':'enfant',niveau:c?c[1]:null};
-  niveau=D.niveaux.length===1?D.niveaux[0][0]:(ins.niveau||null);accueil();
+  niveau=D.niveaux.length===1?D.niveaux[0][0]:(ins.niveau||null);
+  if(o.type&&o.type!=='entree'){
+   if(o.niveau&&D.blocs[o.niveau])niveau=o.niveau;
+   var ids=(Object.prototype.toString.call(o.questions)==='[object Array]'?o.questions:[]).filter(function(id){return !!parId()[id];});
+   if(!niveau||!ids.length){message('Ce test court n\'a pas pu être ouvert.','Écrivez-nous : nous vous renvoyons un lien.');return;}
+   COURT={sem:String(o.type).split('-')[1]||'',ids:ids};}
+  accueil();
  },function(){message('Ce lien de test n\'est pas reconnu.','Reprenez le lien reçu par email. S\'il ne marche toujours pas, écrivez-nous.');});
 }else accueil();
 })();
