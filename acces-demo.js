@@ -17,5 +17,16 @@ const PAGE_PARENT = { type: 'parent', prenom: 'Nadia', eleves: [{ id: E1, prenom
   commandes: [{ packs: ['college-seconde'], mode: '1x', total_centimes: 63000, statut: 'lien créé', paye_le: null, cree_le: iso(-3), url: 'https://lioris.fr/paiement-recu.html' },
               { packs: ['maths-premiere-terminale-24h'], mode: '1x', total_centimes: 96000, statut: 'lien créé', paye_le: null, cree_le: iso(-0.2), url: 'https://lioris.fr/paiement-recu.html' }] };
 
+  // Planning d'exemple plus fourni pour la page du professeur : quatre eleves, une semaine remplie, la suivante entamee.
+  var L0 = new Date(); L0.setHours(0, 0, 0, 0); L0.setDate(L0.getDate() - ((L0.getDay() + 6) % 7));
+  var le = function (j, hh, mm) { var d = new Date(L0.getTime()); d.setDate(d.getDate() + j); d.setHours(hh, mm, 0, 0); return d.toISOString(); };
+  var nS = 0, seance = function (num, quand, min, rendu) { nS++; var passe = new Date(quand).getTime() < Date.now();
+    return { id: 'c0000000-0000-4000-8000-0000000002' + (nS < 10 ? '0' : '') + nS, numero: num, quand: quand, duree_min: min, etat: passe && rendu ? 'faite' : 'prévue', present: passe && rendu ? true : null, visio: 'https://lioris.fr/', compte_rendu: passe && rendu ? { travaille: 'Dérivées de produits.', marche: 'La règle du produit.', bloque: '', travail: 'Trois dérivées à refaire.' } : null }; };
+  var eleve = function (n, prenom, classe, parent, cle, S, R) { return { id: 'e0000000-0000-4000-8000-00000000010' + n, prenom: prenom, classe: classe, parent: parent, tests: [], rendez_vous: R || [], programmes: [{ id: 'b0000000-0000-4000-8000-00000000010' + n, cle: cle, objectif: '', seances: S }] }; };
+  PAGE_PROF.eleves = PAGE_PROF.eleves.concat([
+    eleve(1, 'Yanis', 'Première', 'Karim', 'maths-premiere-terminale-24h', [seance(5, le(0, 18, 0), 60, true), seance(6, le(2, 18, 0), 60, true), seance(7, le(7, 18, 0), 60, true), seance(8, le(9, 18, 0), 60, true)]),
+    eleve(2, 'Inès', 'Seconde', 'Sofia', 'college-seconde', [seance(2, le(1, 17, 0), 90, false), seance(3, le(8, 17, 0), 90, true)]),
+    eleve(3, 'Tom', 'PCSI', 'Claire', 'maths-prepa-24h', [seance(9, le(3, 19, 30), 60, true), seance(10, le(5, 10, 0), 60, true), seance(11, le(10, 19, 30), 60, true)],
+      [{ id: 'd0000000-0000-4000-8000-000000000201', quand: le(4, 12, 30), etat: 'prévu', ecrit: null }])]);
   return { professeur: PAGE_PROF, parent: PAGE_PARENT };
 };
