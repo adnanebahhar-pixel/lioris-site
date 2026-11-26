@@ -21,7 +21,10 @@ function melange(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(M
 var COURT=null;
 function parId(){var par={};[D.commun,niveau].forEach(function(b){if(b&&Object.prototype.hasOwnProperty.call(D.blocs,b)&&D.blocs[b].questions)D.blocs[b].questions.forEach(function(q){par[q.id]={q:q,commun:b===D.commun&&b!==niveau};});});return par;}
 function aRedaction(){return !COURT&&!!(niveau&&D.blocs[niveau].redaction);}
-function accueil(){
+// Prepa : les questions hors du programme de la filiere de l'eleve (marquees « hors » dans les donnees du test) ne lui sont pas posees.
+function filtrer(){var fp=window.LIO_PREPA&&/-prepa$/.test(window.PACK)?window.LIO_PREPA.lire(ins.classe):null;if(!fp||D.filtre===fp.filiere)return;D.filtre=fp.filiere;
+ Object.keys(D.blocs).forEach(function(b){var B=D.blocs[b];if(B&&B.questions)B.questions=B.questions.filter(function(q){return !(q.hors&&q.hors.indexOf(fp.filiere)>=0);});if(B&&B.redaction_hors&&B.redaction_hors.indexOf(fp.filiere)>=0)B.redaction='';});}
+function accueil(){filtrer();
  var avecRed=Object.keys(D.blocs).some(function(k){return D.blocs[k].redaction;});
  var plein=niveau?((D.commun?D.blocs[D.commun].questions.length:0)+D.blocs[niveau].questions.length):0,nb=COURT?COURT.ids.length:plein;
  var dureeTxt=COURT?Math.max(5,Math.round((parseInt(D.duree,10)||30)*nb/(plein||nb||1)))+' min':String(D.duree).replace(/\s*minutes?/,' min');
@@ -130,6 +133,8 @@ if(JETON&&window.CRM&&window.CRM.enLigne()){
   if(!o||o.cle!==window.PACK){message('Ce lien ne correspond pas à ce test.','Reprenez le lien reçu par email, sans le modifier.');return;}
   if(o.utilise){message('Ce test a déjà été passé.','Les réponses sont bien arrivées. Un professeur les explique pendant le rendez-vous.');return;}
   var nomc=String(o.classe||''),mot=nomc.split(/[ ,]/)[0],c=D.classes.filter(function(x){return x[0]===nomc;})[0]||D.classes.filter(function(x){return x[0].split(/[ ,]/)[0]===mot;})[0];
+  // Prepa : la classe est gardee sous la forme « PCSI · en cours d'année » ; le parcours s'en deduit (debut ou suite).
+  var fp=window.LIO_PREPA&&/-prepa$/.test(window.PACK)?window.LIO_PREPA.lire(nomc):null;if(fp)c=D.classes[(fp.annee===2||fp.cours)&&!fp.terminale?D.classes.length-1:0];
   ins={eleve:o.prenom||'',classe:o.classe||'',qui:o.pour_soi?'moi':'enfant',niveau:c?c[1]:null};
   niveau=D.niveaux.length===1?D.niveaux[0][0]:(ins.niveau||null);
   if(o.type&&o.type!=='entree'){

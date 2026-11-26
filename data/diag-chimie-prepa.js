@@ -379,6 +379,9 @@ window.DIAGS["chimie-prepa"] = {
       "calcule la pression partielle de N2",
       "croit que chaque gaz est à la pression totale",
       "multiplie la quantité de matière par la pression, sans fraction molaire"
+     ],
+     "hors": [
+      "MPI"
      ]
     },
     {
@@ -409,6 +412,9 @@ window.DIAGS["chimie-prepa"] = {
       "fait figurer les solides par une concentration",
       "inverse le quotient",
       "remplace l'activité par une quantité de matière : grandeur extensive"
+     ],
+     "hors": [
+      "MPI"
      ]
     },
     {
@@ -424,6 +430,9 @@ window.DIAGS["chimie-prepa"] = {
       "oublie l'exposant 2 sur la pression de NO2",
       "inverse le quotient",
       "inverse le critère d'évolution"
+     ],
+     "hors": [
+      "MPI"
      ]
     },
     {
@@ -485,6 +494,9 @@ window.DIAGS["chimie-prepa"] = {
       "ignore le coefficient stœchiométrique",
       "divise par le coefficient au lieu de multiplier",
       "donne la vitesse de disparition de N2O5"
+     ],
+     "hors": [
+      "MPI"
      ]
     },
     {
@@ -500,6 +512,9 @@ window.DIAGS["chimie-prepa"] = {
       "confond avec l'ordre 1",
       "confond avec l'ordre 0",
       "met l'ordre en exposant au lieu d'intégrer la loi de vitesse"
+     ],
+     "hors": [
+      "MPI"
      ]
     },
     {
@@ -515,6 +530,9 @@ window.DIAGS["chimie-prepa"] = {
       "oublie de prendre l'inverse de la température",
       "oublie le logarithme",
       "erreur de signe sur la pente"
+     ],
+     "hors": [
+      "MPI"
      ]
     },
     {
@@ -530,6 +548,9 @@ window.DIAGS["chimie-prepa"] = {
       "supprime [B] sans le garder dans la constante : loi non homogène",
       "garde le réactif en excès au lieu du réactif limitant",
       "remplace [B] par [A]"
+     ],
+     "hors": [
+      "MPI"
      ]
     },
     {
@@ -670,7 +691,10 @@ window.DIAGS["chimie-prepa"] = {
     }
    ],
    "redaction": "On suit la décomposition d'un réactif A, seul réactif, en solution à température constante. On mesure sa concentration : 80 mmol/L à t = 0 ; 40 mmol/L à t = 10 min ; 20 mmol/L à t = 20 min ; 10 mmol/L à t = 30 min. Données : ln 2 ≈ 0,69 ; ln 100 ≈ 4,6.\n1. Détermine les temps de demi-réaction successifs. Quel ordre ces mesures suggèrent-elles ? Justifie.\n2. Écris la loi de vitesse correspondante, puis établis l'expression de [A] en fonction du temps.\n3. Calcule la constante de vitesse k, avec son unité.\n4. À quelle date reste-t-il 1 % du réactif ?\n5. Si la réaction était d'ordre 2, combien de temps faudrait-il pour passer de 40 à 20 mmol/L ? Conclus.",
-   "corrige": "La concentration est divisée par 2 toutes les 10 min, quelle que soit la concentration de départ (80, puis 40, puis 20 mmol/L). Un temps de demi-réaction indépendant de la concentration initiale est la signature de l'ordre 1. Loi de vitesse : v = −d[A]/dt = k [A]. On sépare les variables : d[A]/[A] = −k dt, donc ln([A]/[A]0) = −k t et [A](t) = [A]0 e^(−k t). Au temps de demi-réaction, [A] = [A]0/2, d'où t½ = ln 2 / k et k = ln 2 / t½ = 0,69/10 = 0,069 min^(−1). Il reste 1 % quand e^(−k t) = 1/100, soit t = ln 100 / k = 4,6/0,069 ≈ 67 min. Pour un ordre 2, t½ = 1/(k [A]0) : il double quand la concentration de départ est divisée par 2. Il faudrait donc 20 min, et non 10, pour passer de 40 à 20 mmol/L. Les mesures écartent l'ordre 2 et confirment l'ordre 1."
+   "corrige": "La concentration est divisée par 2 toutes les 10 min, quelle que soit la concentration de départ (80, puis 40, puis 20 mmol/L). Un temps de demi-réaction indépendant de la concentration initiale est la signature de l'ordre 1. Loi de vitesse : v = −d[A]/dt = k [A]. On sépare les variables : d[A]/[A] = −k dt, donc ln([A]/[A]0) = −k t et [A](t) = [A]0 e^(−k t). Au temps de demi-réaction, [A] = [A]0/2, d'où t½ = ln 2 / k et k = ln 2 / t½ = 0,69/10 = 0,069 min^(−1). Il reste 1 % quand e^(−k t) = 1/100, soit t = ln 100 / k = 4,6/0,069 ≈ 67 min. Pour un ordre 2, t½ = 1/(k [A]0) : il double quand la concentration de départ est divisée par 2. Il faudrait donc 20 min, et non 10, pour passer de 40 à 20 mmol/L. Les mesures écartent l'ordre 2 et confirment l'ordre 1.",
+   "redaction_hors": [
+    "MPI"
+   ]
   }
  },
  "domaines": [

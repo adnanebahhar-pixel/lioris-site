@@ -239,6 +239,10 @@ window.DIAGS["maths-prepa"] = {
       "oublie le facteur 1/2",
       "multiplie par 2 au lieu de diviser",
       "prend −sin comme primitive de cos"
+     ],
+     "hors": [
+      "ECT",
+      "ECG appliquées"
      ]
     },
     {
@@ -314,6 +318,10 @@ window.DIAGS["maths-prepa"] = {
       "prend cos(2π/3) = 1/2",
       "prend sin(5π/6) = −1/2",
       "prend sin(5π/6) = √3/2"
+     ],
+     "hors": [
+      "ECT",
+      "ECG appliquées"
      ]
     },
     {
@@ -329,6 +337,10 @@ window.DIAGS["maths-prepa"] = {
       "oublie la seconde solution",
       "utilise la symétrie du sinus",
       "confond π/3 et π/6"
+     ],
+     "hors": [
+      "ECT",
+      "ECG appliquées"
      ]
     }
    ],

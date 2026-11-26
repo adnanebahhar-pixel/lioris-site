@@ -148,3 +148,6 @@
   .t6 .progress > i, .t6 .opt, .t6 .opt.sel .t-l path { transition:none; }
   .t6 .t-ok path { animation:none; stroke-dashoffset:0; }
 }
+
+/* Bouton coupe (classe de prepa hors champ) : il doit se voir comme coupe. */
+.t6 .btn:disabled { opacity:.4; cursor:not-allowed; }

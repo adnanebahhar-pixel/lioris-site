@@ -203,6 +203,11 @@ window.DIAGS["physique-prepa"] = {
       "confond la vitesse avec le champ de gravitation",
       "oublie le rayon dans l'accélération v²/r",
       "multiplie par r au lieu de diviser : résultat non homogène à une vitesse"
+     ],
+     "hors": [
+      "TB",
+      "ATS génie civil",
+      "ATS ingénierie industrielle"
      ]
     },
     {
@@ -218,6 +223,11 @@ window.DIAGS["physique-prepa"] = {
       "croit la période proportionnelle au rayon",
       "oublie la racine : calcule r³",
       "prend le carré au lieu de la puissance 3/2"
+     ],
+     "hors": [
+      "TB",
+      "ATS génie civil",
+      "ATS ingénierie industrielle"
      ]
     },
     {
@@ -248,6 +258,9 @@ window.DIAGS["physique-prepa"] = {
       "ne convertit ni les kilo-ohms ni les microfarads",
       "ne convertit pas les kilo-ohms",
       "ne convertit pas les microfarads"
+     ],
+     "hors": [
+      "TB"
      ]
     },
     {
@@ -263,6 +276,9 @@ window.DIAGS["physique-prepa"] = {
       "croit que la charge du condensateur est instantanée",
       "confond avec la tension aux bornes de la résistance",
       "croit qu'aucun courant ne circule jamais dans la branche d'un condensateur"
+     ],
+     "hors": [
+      "TB"
      ]
     },
     {
@@ -361,6 +377,12 @@ window.DIAGS["physique-prepa"] = {
       "inverse les indices : un sinus ne peut pas dépasser 1",
       "oublie le sinus",
       "inverse la condition : la réflexion totale exige d'aller vers le milieu le moins réfringent"
+     ],
+     "hors": [
+      "TB",
+      "ATS génie civil",
+      "ATS ingénierie industrielle",
+      "ATS métiers de la chimie"
      ]
     },
     {
@@ -376,6 +398,12 @@ window.DIAGS["physique-prepa"] = {
       "erreur de signe dans la relation de conjugaison : additionne les inverses",
       "soustrait les distances au lieu des inverses",
       "additionne les distances"
+     ],
+     "hors": [
+      "TB",
+      "ATS génie civil",
+      "ATS ingénierie industrielle",
+      "ATS métiers de la chimie"
      ]
     },
     {
@@ -391,6 +419,12 @@ window.DIAGS["physique-prepa"] = {
       "oublie le signe : l'image est renversée",
       "inverse le rapport",
       "cumule les deux erreurs"
+     ],
+     "hors": [
+      "TB",
+      "ATS génie civil",
+      "ATS ingénierie industrielle",
+      "ATS métiers de la chimie"
      ]
     },
     {
@@ -422,6 +456,10 @@ window.DIAGS["physique-prepa"] = {
       "se trompe sur le signe devant k x",
       "inverse le quotient : obtient l'inverse d'une vitesse",
       "multiplie au lieu de diviser : résultat non homogène à une vitesse"
+     ],
+     "hors": [
+      "BCPST",
+      "TB"
      ]
     },
     {
@@ -482,6 +520,9 @@ window.DIAGS["physique-prepa"] = {
       "place RC devant u : équation non homogène",
       "erreur de signe : la solution diverge",
       "oublie le second membre : écrit le régime libre"
+     ],
+     "hors": [
+      "TB"
      ]
     },
     {
@@ -497,6 +538,9 @@ window.DIAGS["physique-prepa"] = {
       "confond la charge avec la décharge",
       "confond la constante de temps avec la durée de demi-charge",
       "croit la charge terminée au bout de τ"
+     ],
+     "hors": [
+      "TB"
      ]
     },
     {
@@ -512,6 +556,9 @@ window.DIAGS["physique-prepa"] = {
       "confond la charge portée par le condensateur avec le courant",
       "traite le condensateur comme un fil : confusion avec la bobine",
       "confond régime continu et régime sinusoïdal"
+     ],
+     "hors": [
+      "TB"
      ]
     },
     {
@@ -527,6 +574,9 @@ window.DIAGS["physique-prepa"] = {
       "oublie le facteur 1/2",
       "oublie le carré de la tension",
       "ne convertit pas les microfarads"
+     ],
+     "hors": [
+      "TB"
      ]
     },
     {
@@ -543,6 +593,9 @@ window.DIAGS["physique-prepa"] = {
       "confond valeur de la vitesse et vecteur vitesse",
       "raisonne avec la force centrifuge",
       "confond la direction de l'accélération avec celle de la vitesse"
+     ],
+     "hors": [
+      "TB"
      ]
     },
     {
@@ -558,6 +611,12 @@ window.DIAGS["physique-prepa"] = {
       "oublie le facteur r : second terme non homogène à une vitesse",
       "oublie que le vecteur u_r tourne avec le point",
       "échange les composantes radiale et orthoradiale"
+     ],
+     "hors": [
+      "BCPST",
+      "TB",
+      "ATS génie civil",
+      "ATS ingénierie industrielle"
      ]
     },
     {
@@ -588,6 +647,13 @@ window.DIAGS["physique-prepa"] = {
       "confond avec le mouvement dans un champ électrique uniforme",
       "croit que la force magnétique travaille",
       "croit que la force magnétique est colinéaire à la vitesse, ou nulle"
+     ],
+     "hors": [
+      "TSI1",
+      "BCPST",
+      "TB",
+      "ATS ingénierie industrielle",
+      "ATS métiers de la chimie"
      ]
     },
     {
@@ -652,7 +718,10 @@ window.DIAGS["physique-prepa"] = {
     }
    ],
    "redaction": "Un condensateur de capacité C = 100 µF, chargé sous la tension U0 = 6,0 V, se décharge à partir de t = 0 dans un conducteur ohmique de résistance R = 10 kΩ. On note u(t) la tension aux bornes du condensateur. Le condensateur et le conducteur ohmique sont orientés en convention récepteur. Donnée : ln 2 ≈ 0,69.\n1. Fais le schéma du circuit et établis l'équation différentielle vérifiée par u(t).\n2. Résous cette équation en tenant compte de la condition initiale.\n3. Donne l'expression de la constante de temps τ, vérifie son homogénéité à l'aide des unités, puis calcule-la.\n4. À quelle date la tension vaut-elle U0/2 ?\n5. Calcule l'énergie dissipée dans le conducteur ohmique pendant toute la décharge. Justifie.",
-   "corrige": "Avec une même intensité i orientée en convention récepteur pour les deux dipôles, i = C du/dt et la loi des mailles s'écrit u + R i = 0, donc RC du/dt + u = 0. Les solutions sont de la forme u(t) = K e^(−t/τ) avec τ = RC ; la tension aux bornes d'un condensateur est continue, donc u(0) = U0 et u(t) = U0 e^(−t/τ). Homogénéité : R s'exprime en V/A et C en A·s/V, donc RC est en secondes. τ = 10 × 10^3 × 100 × 10^(−6) = 1,0 s. u = U0/2 quand e^(−t/τ) = 1/2, soit t = τ ln 2 ≈ 0,69 s. À la fin de la décharge, le condensateur est vide : toute l'énergie qu'il stockait a été dissipée par effet Joule dans le conducteur ohmique, soit ½ C U0² = 0,5 × 100 × 10^(−6) × 36 = 1,8 × 10^(−3) J."
+   "corrige": "Avec une même intensité i orientée en convention récepteur pour les deux dipôles, i = C du/dt et la loi des mailles s'écrit u + R i = 0, donc RC du/dt + u = 0. Les solutions sont de la forme u(t) = K e^(−t/τ) avec τ = RC ; la tension aux bornes d'un condensateur est continue, donc u(0) = U0 et u(t) = U0 e^(−t/τ). Homogénéité : R s'exprime en V/A et C en A·s/V, donc RC est en secondes. τ = 10 × 10^3 × 100 × 10^(−6) = 1,0 s. u = U0/2 quand e^(−t/τ) = 1/2, soit t = τ ln 2 ≈ 0,69 s. À la fin de la décharge, le condensateur est vide : toute l'énergie qu'il stockait a été dissipée par effet Joule dans le conducteur ohmique, soit ½ C U0² = 0,5 × 100 × 10^(−6) × 36 = 1,8 × 10^(−3) J.",
+   "redaction_hors": [
+    "TB"
+   ]
   }
  },
  "domaines": [
