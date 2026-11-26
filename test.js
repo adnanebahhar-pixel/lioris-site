@@ -11,7 +11,7 @@ var niveau=D.niveaux.length===1?D.niveaux[0][0]:(ins.niveau||null), liste=[], i=
 var ENC='lioris_encours_'+window.PACK+(JETON?'_'+JETON.slice(0,8):''),RES=null,etape='q';
 function garder(){try{localStorage.setItem(ENC,JSON.stringify({niveau:niveau,ordre:liste.map(function(it){return {id:it.q.id,c:it.commun,o:it.opts.map(function(o){return o.k;})};}),i:i,rep:rep,debut:debut,etape:etape}));}catch(e){}}
 function oublier(){try{localStorage.removeItem(ENC);}catch(e){}}
-function enCours(){try{var s=JSON.parse(localStorage.getItem(ENC)||'null');if(!s||!s.ordre||!s.ordre.length||!D.blocs[s.niveau]||Date.now()-s.debut>864e5)return null;
+function enCours(){try{var s=JSON.parse(localStorage.getItem(ENC)||'null');if(!s||!s.ordre||!s.ordre.length||!Object.prototype.hasOwnProperty.call(D.blocs,s.niveau)||Date.now()-s.debut>864e5)return null;
   var par={};[D.commun,s.niveau].forEach(function(b){if(b&&D.blocs[b])D.blocs[b].questions.forEach(function(q){par[q.id]=q;});});
   var L=s.ordre.map(function(x){var q=par[x.id];if(!q)return null;var o=x.o.map(function(k){if(k==='ok')return {t:q.ok,k:k};var n=+String(k).slice(3);return q.bad[n]===undefined?null:{t:q.bad[n],k:k};});return o.indexOf(null)>=0||o.length!==q.bad.length+1?null:{q:q,commun:!!x.c,opts:o};});
   if(L.indexOf(null)>=0)return null;s.liste=L;s.i=Math.max(0,Math.min(L.length-1,s.i|0));return s;}catch(e){return null;}}
@@ -19,7 +19,7 @@ function melange(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(M
 // Test court des semaines 6 et 12 (2026-11-26) : meme ecran, mais une douzaine de questions du test d'entree, choisies par l'administration
 // (COURT.ids), sans exercice a rediger. Il n'arrive que par un lien recu par email.
 var COURT=null;
-function parId(){var par={};[D.commun,niveau].forEach(function(b){if(b&&D.blocs[b])D.blocs[b].questions.forEach(function(q){par[q.id]={q:q,commun:b===D.commun&&b!==niveau};});});return par;}
+function parId(){var par={};[D.commun,niveau].forEach(function(b){if(b&&Object.prototype.hasOwnProperty.call(D.blocs,b)&&D.blocs[b].questions)D.blocs[b].questions.forEach(function(q){par[q.id]={q:q,commun:b===D.commun&&b!==niveau};});});return par;}
 function aRedaction(){return !COURT&&!!(niveau&&D.blocs[niveau].redaction);}
 function accueil(){
  var avecRed=Object.keys(D.blocs).some(function(k){return D.blocs[k].redaction;});
@@ -133,7 +133,7 @@ if(JETON&&window.CRM&&window.CRM.enLigne()){
   ins={eleve:o.prenom||'',classe:o.classe||'',qui:o.pour_soi?'moi':'enfant',niveau:c?c[1]:null};
   niveau=D.niveaux.length===1?D.niveaux[0][0]:(ins.niveau||null);
   if(o.type&&o.type!=='entree'){
-   if(o.niveau&&D.blocs[o.niveau])niveau=o.niveau;
+   if(o.niveau&&Object.prototype.hasOwnProperty.call(D.blocs,o.niveau))niveau=o.niveau;
    var ids=(Object.prototype.toString.call(o.questions)==='[object Array]'?o.questions:[]).filter(function(id){return !!parId()[id];});
    if(!niveau||!ids.length){message('Ce test court n\'a pas pu être ouvert.','Écrivez-nous : nous vous renvoyons un lien.');return;}
    COURT={sem:String(o.type).split('-')[1]||'',ids:ids};}

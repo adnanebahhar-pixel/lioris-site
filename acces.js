@@ -21,7 +21,7 @@ function rpc(nom,corps){return fetch(CFG.url+'/rest/v1/rpc/'+nom,{method:'POST',
 function groupe(D0,n,err){if(n===0)return 'pasvu';if(n<3)return 'peu';if(D0.seuils==='pourcent'){var r=(n-err)/n;return r>=0.8?'sat':r>=0.5?'fra':'bes';}if(D0.seuils==='prepa'&&n>=5)return err<=1?'sat':err===2?'fra':'bes';return err===0?'sat':err===1?'fra':'bes';}
 function lecture(t){var D0=window.DIAGS&&Object.prototype.hasOwnProperty.call(window.DIAGS,t.cle)?window.DIAGS[t.cle]:null,o={ok:0,total:0,erreurs:[],sans:0,nsp:0,titre:D0?D0.titre:t.cle,domaines:[]};if(!D0||!D0.blocs)return o;
  var R=t.reponses||{},dom={};
- (D0.domaines||[]).forEach(function(d,i){var ids=(d.ids&&(d.ids[t.niveau]||[]))||[];if(!ids.length&&d.ids&&!t.niveau)Object.keys(d.ids).forEach(function(k){ids=ids.concat(d.ids[k]);});
+ (D0.domaines||[]).forEach(function(d,i){var ids=(d.ids&&Object.prototype.hasOwnProperty.call(d.ids,t.niveau)&&d.ids[t.niveau])||[];if(Object.prototype.toString.call(ids)!=='[object Array]')ids=[];if(!ids.length&&d.ids&&!t.niveau)Object.keys(d.ids).forEach(function(k){ids=ids.concat(d.ids[k]);});
   var n=0,err=0,vu=0;ids.forEach(function(id){dom[id]=i;var x=R[id];if(!x)return;vu++;if(x.k==='pasvu')return;n++;if(x.k!=='ok')err++;});
   if(vu)o.domaines.push({i:i,nom:d.nom,g:groupe(D0,n,err)});});
  Object.keys(D0.blocs).forEach(function(b){D0.blocs[b].questions.forEach(function(q){var x=R[q.id];if(!x)return;o.total++;

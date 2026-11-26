@@ -70,7 +70,7 @@ function reponsesAJour(e,t,avant){var R={},k;for(k in (t.reponses||{}))R[k]=t.re
 // seulement au test court (a confirmer), puis les autres. Dans chaque groupe, l'ordre du test.
 function choixCourt(e,t){var D0=window.DIAGS&&Object.prototype.hasOwnProperty.call(window.DIAGS,t.cle)?window.DIAGS[t.cle]:null;if(!D0||!D0.blocs)return [];
  var R=reponsesAJour(e,t),R0=t.reponses||{},L=[],n=0;
- [D0.commun,t.niveau].forEach(function(b,ib){if(!b||!D0.blocs[b]||(ib===1&&b===D0.commun))return;D0.blocs[b].questions.forEach(function(q){var x=R[q.id],x0=R0[q.id];if(!x)return;
+ [D0.commun,t.niveau].forEach(function(b,ib){if(!b||!Object.prototype.hasOwnProperty.call(D0.blocs,b)||!D0.blocs[b].questions||(ib===1&&b===D0.commun))return;D0.blocs[b].questions.forEach(function(q){var x=R[q.id],x0=R0[q.id];if(!x)return;
   var r=/^bad\d+$/.test(x.k)?0:x.k==='nsp'?1:x.k==='pasvu'?2:(x0&&x0.k!=='ok')?3:4;L.push([r,n++,q.id]);});});
  return L.sort(function(a,b){return (a[0]-b[0])||(a[1]-b[1]);}).slice(0,NB_COURT).map(function(x){return x[2];});}
 function bilanCourt(e,t,c){var A=reponsesAJour(e,t,c.passe_le),o={n:0,reglees:0,restent:0,nouvelles:0};Object.keys(c.reponses||{}).forEach(function(id){var a=A[id],b=c.reponses[id];o.n++;var okA=!!a&&a.k==='ok',okB=b.k==='ok';if(!okA&&okB)o.reglees++;else if(!okA&&!okB)o.restent++;else if(okA&&!okB)o.nouvelles++;});return o;}
@@ -101,6 +101,10 @@ function blocAvis(e){if(!(e.rdv&&e.rdv.etat==='fait'))return '';var i=invitee(e.
  return '<h3>Avis</h3>'+(i?'<p class="petit" style="margin:0">Invitation envoyée le '+jour(i.quand)+'.</p>':'<p class="petit" style="margin:0 0 8px">Le rendez-vous est fait : invitez la famille à donner son avis. Même message pour toutes les familles, sans contrepartie.</p>'+(e.fam.email?'<button type="button" class="act" data-a="avis" data-id="'+e.id+'">Écrire l\'invitation</button>':'<span class="petit">Aucun email sur la fiche.</span>'));}
 // ---------- ce qui demande une action
 function afaire(){var l=[],now=Date.now();
+ // Securite (audit du 2026-11-26) : une affluence anormale se voit ici. Au-dela de 40 inscriptions en dix minutes, la base n'envoie plus d'email.
+ var h1=D.fam.filter(function(f){return heures(f.cree_le)<1;}).length,d1=D.dem.filter(function(d){return heures(d.cree_le)<1;}).length;
+ if(h1>=15)l.push(['','Alerte : '+h1+' inscriptions dans la dernière heure','Affluence inhabituelle. Si ce n\'est pas une publicité en cours, ce sont peut-être des inscriptions automatiques : regardez les fiches avant d\'envoyer quoi que ce soit.','Voir','familles','']);
+ if(d1>=10)l.push(['','Alerte : '+d1+' demandes dans la dernière heure','Affluence inhabituelle sur les demandes de rétractation, d\'arrêt ou de rappel.','Voir','demandes','']);
  D.dem.filter(function(d){return !d.traite;}).forEach(function(d){l.push(['','Demande : '+({retractation:'rétractation',arret:'arrêt du programme',rappel:'rappel'}[d.type]||d.type)+' de '+d.nom,jour(d.cree_le)+(d.type==='retractation'?' · le délai légal court':''),'Voir','demandes','']);});
  D.fam.forEach(function(f){if(f.relance_le&&f.relance_le<=new Date().toISOString().slice(0,10)&&f.eleves[0])l.push(['j','Relance prévue : famille de '+f.parent_prenom,'Prévue le '+jour(f.relance_le,1),'Ouvrir','fiche',f.eleves[0].id]);});
  D.el.forEach(function(e){var t=e.tests[0];
@@ -179,7 +183,7 @@ function blocLien(type,id,titre,aide){var col={professeur:'professeur_id',parent
  var o='<h3>'+h(titre)+'</h3>';
  if(!l)return o+'<p class="petit" style="margin:0 0 8px">'+h(aide)+' Aucun lien actif.</p><button type="button" class="act" data-a="lien-creer" data-type="'+type+'" data-id="'+id+'">Débloquer le lien</button>';
  var u=ici()+'acces.html#l='+l.jeton;
- return o+'<div class="lien-b"><input type="text" readonly value="'+h(u)+'" aria-label="Lien personnel" id="l-'+l.jeton+'"><span><button type="button" class="act" data-a="copie" data-id="l-'+l.jeton+'">Copier</button></span></div><p class="petit" style="margin:6px 0 8px">Créé '+jour(l.cree_le,1)+' · '+(l.ouvertures?'ouvert '+l.ouvertures+' fois, la dernière '+jour(l.ouvert_le):'jamais ouvert')+'</p><button type="button" class="act" data-a="lien-refaire" data-id="'+l.jeton+'">Refaire un lien neuf</button> <button type="button" class="act danger" data-a="lien-couper" data-id="'+l.jeton+'">Couper le lien</button>';}
+ return o+'<div class="lien-b"><input type="text" readonly value="'+h(u)+'" aria-label="Lien personnel" id="l-'+l.jeton+'"><span><button type="button" class="act" data-a="copie" data-id="l-'+l.jeton+'">Copier</button></span></div><p class="petit" style="margin:6px 0 8px">Créé '+jour(l.cree_le,1)+' · '+(l.ouvertures?'ouvert '+l.ouvertures+' fois, la dernière '+jour(l.ouvert_le):'jamais ouvert')+(l.expire_le?' · valable jusqu\'au '+jour(l.expire_le,1):'')+'</p><button type="button" class="act" data-a="lien-refaire" data-id="'+l.jeton+'">Refaire un lien neuf</button> <button type="button" class="act danger" data-a="lien-couper" data-id="'+l.jeton+'">Couper le lien</button>';}
 function plier(titre,ouvert,corps){return '<details class="bloc"'+(ouvert?' open':'')+'><summary>'+titre+'</summary><div class="pli">'+corps+'</div></details>';}
 function etapes(e){var paye=e.commandes.some(payee),r=e.rdv,S=[['Inscrit',true],['Test passé',e.tests.length>0],['Rendez-vous fait',!!(r&&r.etat==='fait')],['Payé',paye],['Programme en cours',e.programmes.length>0]],a;
  if(!S[1][1])a='Relancer '+e.fam.parent_prenom+' pour que '+e.prenom+' passe son test. Le lien du test est plus bas : copiez-le ou envoyez-le par email.';
