@@ -21,8 +21,10 @@ premiere:[['Maths',MT],['Physique-chimie',PC]],
 terminale:[['Maths',MT],['Physique-chimie',PC]],
 prepa:[['Maths',I+'maths-prepa'],['Physique',I+'physique-prepa'],['Chimie',I+'chimie-prepa']],
 // 2026-11-26 : le BTS entre dans le choix (test de maths du BTS) ; « Etudes superieures » en sort, ses pages ont quitte le site.
-bts:[['Maths',I+'maths-bts']]};
-var N=[['college','Collège'],['seconde','Seconde'],['premiere','Première'],['terminale','Terminale'],['prepa','Prépa'],['bts','BTS']];
+// 2026-11-26 (decision d'ad) : la physique en BTS et en licence a sa page et son test.
+bts:[['Maths',I+'maths-bts'],['Physique',I+'physique-superieur']],
+licence:[['Physique',I+'physique-superieur']]};
+var N=[['college','Collège'],['seconde','Seconde'],['premiere','Première'],['terminale','Terminale'],['prepa','Prépa'],['bts','BTS'],['licence','Licence']];
 var q=document.getElementById('q'),z=document.getElementById('zone'),ou=document.getElementById('ou'),av=document.getElementById('av'),r=document.getElementById('retour'),etape=1,niv=null,qui='enfant';
 function bouton(t,f){var b=document.createElement('button');b.type='button';b.className='option';b.textContent=t;b.onclick=f;return b;}
 function pose(n,titre,premier){etape=n;ou.textContent='Étape '+n+' sur 3';av.style.transform='scaleX('+(n/3)+')';q.textContent=titre;z.innerHTML='';z.className='options';r.hidden=(n===1);if(!premier)q.focus();}
