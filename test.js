@@ -22,8 +22,9 @@ var COURT=null;
 function parId(){var par={};[D.commun,niveau].forEach(function(b){if(b&&Object.prototype.hasOwnProperty.call(D.blocs,b)&&D.blocs[b].questions)D.blocs[b].questions.forEach(function(q){par[q.id]={q:q,commun:b===D.commun&&b!==niveau};});});return par;}
 function aRedaction(){return !COURT&&!!(niveau&&D.blocs[niveau].redaction);}
 // Prepa : les questions hors du programme de la filiere de l'eleve (marquees « hors » dans les donnees du test) ne lui sont pas posees.
-function filtrer(){var fp=window.LIO_PREPA&&/-prepa$/.test(window.PACK)?window.LIO_PREPA.lire(ins.classe):null;if(!fp||D.filtre===fp.filiere)return;D.filtre=fp.filiere;
- Object.keys(D.blocs).forEach(function(b){var B=D.blocs[b];if(B&&B.questions)B.questions=B.questions.filter(function(q){return !(q.hors&&q.hors.indexOf(fp.filiere)>=0);});if(B&&B.redaction_hors&&B.redaction_hors.indexOf(fp.filiere)>=0)B.redaction='';});}
+function filtrer(){var fp=window.LIO_PREPA&&/-prepa$/.test(window.PACK)?window.LIO_PREPA.lire(ins.classe):null,fi=fp?fp.filiere:'-';if(D.filtre===fi)return;D.filtre=fi;
+ // « hors » : question ecartee pour ces filieres. « pour » : question ecrite pour ces seules filieres (elle n'est posee a personne d'autre).
+ Object.keys(D.blocs).forEach(function(b){var B=D.blocs[b];if(B&&B.questions)B.questions=B.questions.filter(function(q){return !(q.hors&&q.hors.indexOf(fi)>=0)&&!(q.pour&&q.pour.indexOf(fi)<0);});if(B&&B.redaction_hors&&B.redaction_hors.indexOf(fi)>=0)B.redaction='';});}
 function accueil(){filtrer();
  var avecRed=Object.keys(D.blocs).some(function(k){return D.blocs[k].redaction;});
  var plein=niveau?((D.commun?D.blocs[D.commun].questions.length:0)+D.blocs[niveau].questions.length):0,nb=COURT?COURT.ids.length:plein;

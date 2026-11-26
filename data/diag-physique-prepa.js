@@ -715,6 +715,186 @@ window.DIAGS["physique-prepa"] = {
       "ne dérive pas : confond force et énergie",
       "dérive x² en x"
      ]
+    },
+    {
+     "id": "TB1",
+     "q": "Un point a pour coordonnées x(t) = 4t et y(t) = 3t − 5t² (x et y en m, t en s). À t = 0, la valeur de sa vitesse est",
+     "ok": "5 m/s",
+     "bad": [
+      "7 m/s",
+      "4 m/s",
+      "10 m/s"
+     ],
+     "err": [
+      "additionne les deux composantes au lieu de calculer la norme",
+      "oublie la composante de la vitesse selon y",
+      "dérive deux fois : donne la valeur de l'accélération"
+     ],
+     "pour": [
+      "TB"
+     ]
+    },
+    {
+     "id": "TB2",
+     "q": "Une voiture démarre en ligne droite, sans vitesse initiale, avec une accélération constante de 2 m/s². Au bout de 10 s, elle a parcouru",
+     "ok": "100 m",
+     "bad": [
+      "200 m",
+      "20 m",
+      "10 m"
+     ],
+     "err": [
+      "oublie le facteur 1/2 de la loi horaire",
+      "calcule a × t : donne la vitesse atteinte, pas la distance",
+      "oublie le carré du temps"
+     ],
+     "pour": [
+      "TB"
+     ]
+    },
+    {
+     "id": "TB3",
+     "q": "Une bille est lancée horizontalement. Avec un axe y dirigé vers le bas, ses équations horaires sont x(t) = 2t et y(t) = 5t² (x et y en m, t en s). L'équation de sa trajectoire est",
+     "ok": "y = 1,25 x²",
+     "bad": [
+      "y = 2,5 x²",
+      "y = 20 x²",
+      "y = 2,5 x"
+     ],
+     "err": [
+      "n'élève pas le 2 au carré en remplaçant t par x/2",
+      "écrit t = 2x au lieu de t = x/2",
+      "oublie le carré en remplaçant t : obtient une droite"
+     ],
+     "pour": [
+      "TB"
+     ]
+    },
+    {
+     "id": "TB4",
+     "q": "Une cabine d'ascenseur de masse 500 kg monte avec une accélération de 2 m/s² dirigée vers le haut. On prend g = 10 m/s². La force exercée par le câble sur la cabine vaut",
+     "ok": "6 000 N",
+     "bad": [
+      "5 000 N",
+      "4 000 N",
+      "1 000 N"
+     ],
+     "err": [
+      "croit que le câble compense juste le poids : ignore l'accélération",
+      "erreur de signe en projetant la deuxième loi de Newton",
+      "calcule m × a seul : oublie le poids"
+     ],
+     "pour": [
+      "TB"
+     ]
+    },
+    {
+     "id": "TB5",
+     "q": "Un palet glisse en ligne droite, à vitesse constante, sur une table horizontale. La résultante des forces qui s'exercent sur lui est",
+     "ok": "nulle",
+     "bad": [
+      "dirigée dans le sens du mouvement",
+      "dirigée en sens inverse du mouvement",
+      "égale à son poids"
+     ],
+     "err": [
+      "croit qu'un mouvement exige une force dans son sens",
+      "ne compte que les frottements : le palet ralentirait",
+      "ne compte que le poids : oublie la réaction de la table"
+     ],
+     "pour": [
+      "TB"
+     ]
+    },
+    {
+     "id": "TB6",
+     "q": "On tire une valise sur 10 m de sol horizontal avec une force constante de 50 N, inclinée de 60° par rapport à l'horizontale. On donne cos 60° = 0,5. Le travail de cette force vaut",
+     "ok": "250 J",
+     "bad": [
+      "500 J",
+      "1 000 J",
+      "25 J"
+     ],
+     "err": [
+      "oublie le cosinus : fait comme si la force était parallèle au déplacement",
+      "divise par le cosinus au lieu de multiplier",
+      "oublie la distance : calcule seulement la composante horizontale de la force"
+     ],
+     "pour": [
+      "TB"
+     ]
+    },
+    {
+     "id": "TB7",
+     "q": "Un skieur de 80 kg part sans vitesse et descend une piste dont le dénivelé est de 20 m. Il arrive en bas à 10 m/s. On prend g = 10 m/s². Le travail des forces de frottement vaut",
+     "ok": "−12 000 J",
+     "bad": [
+      "+12 000 J",
+      "−8 000 J",
+      "+20 000 J"
+     ],
+     "err": [
+      "oublie le signe : une force de frottement a un travail résistant",
+      "oublie le facteur 1/2 de l'énergie cinétique",
+      "compte le travail du poids comme résistant alors que le skieur descend"
+     ],
+     "pour": [
+      "TB"
+     ]
+    },
+    {
+     "id": "TB8",
+     "q": "Deux armatures planes et parallèles, distantes de 5 cm, sont soumises à une différence de potentiel de 100 V. Le champ électrostatique entre elles, supposé uniforme, a pour valeur",
+     "ok": "2 000 V/m",
+     "bad": [
+      "20 V/m",
+      "5 V·m",
+      "5 × 10^(−4) m/V"
+     ],
+     "err": [
+      "ne convertit pas les centimètres en mètres",
+      "multiplie la tension par la distance au lieu de diviser",
+      "inverse le quotient"
+     ],
+     "pour": [
+      "TB"
+     ]
+    },
+    {
+     "id": "TB9",
+     "q": "Dans une cuve d'électrophorèse, un ion de charge q positive est soumis à la force électrique q E et à une force de frottement de valeur α × v, opposée à sa vitesse. Sa mobilité électrophorétique μ, définie par v_lim = μ E, vaut",
+     "ok": "q/α",
+     "bad": [
+      "α/q",
+      "q E/α",
+      "q × α"
+     ],
+     "err": [
+      "inverse le quotient",
+      "donne la vitesse limite, pas la mobilité",
+      "multiplie au lieu de diviser"
+     ],
+     "pour": [
+      "TB"
+     ]
+    },
+    {
+     "id": "TB10",
+     "q": "Pendant 10 s, 5 × 10^15 ions portant chacun une charge de 3,2 × 10^(−19) C traversent, dans le même sens, une section de la cuve d'électrophorèse. L'intensité du courant vaut",
+     "ok": "1,6 × 10^(−4) A",
+     "bad": [
+      "1,6 × 10^(−3) A",
+      "1,6 × 10^(−2) A",
+      "5 × 10^14 A"
+     ],
+     "err": [
+      "calcule la charge totale sans diviser par la durée",
+      "multiplie la charge totale par la durée au lieu de diviser",
+      "divise le nombre d'ions par la durée : oublie la charge de chaque ion"
+     ],
+     "pour": [
+      "TB"
+     ]
     }
    ],
    "redaction": "Un condensateur de capacité C = 100 µF, chargé sous la tension U0 = 6,0 V, se décharge à partir de t = 0 dans un conducteur ohmique de résistance R = 10 kΩ. On note u(t) la tension aux bornes du condensateur. Le condensateur et le conducteur ohmique sont orientés en convention récepteur. Donnée : ln 2 ≈ 0,69.\n1. Fais le schéma du circuit et établis l'équation différentielle vérifiée par u(t).\n2. Résous cette équation en tenant compte de la condition initiale.\n3. Donne l'expression de la constante de temps τ, vérifie son homogénéité à l'aide des unités, puis calcule-la.\n4. À quelle date la tension vaut-elle U0/2 ?\n5. Calcule l'énergie dissipée dans le conducteur ohmique pendant toute la décharge. Justifie.",
@@ -753,7 +933,12 @@ window.DIAGS["physique-prepa"] = {
      "S13",
      "S14",
      "S15",
-     "S16"
+     "S16",
+     "TB1",
+     "TB2",
+     "TB3",
+     "TB4",
+     "TB5"
     ]
    }
   },
@@ -769,7 +954,9 @@ window.DIAGS["physique-prepa"] = {
      "S17",
      "S18",
      "S19",
-     "S20"
+     "S20",
+     "TB6",
+     "TB7"
     ]
    }
   },
@@ -787,7 +974,10 @@ window.DIAGS["physique-prepa"] = {
      "S9",
      "S10",
      "S11",
-     "S12"
+     "S12",
+     "TB8",
+     "TB9",
+     "TB10"
     ]
    }
   },
