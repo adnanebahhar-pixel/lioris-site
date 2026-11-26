@@ -1,4 +1,6 @@
-// Outil de test, squelette. Les donnees viennent de data/diag-*.js, fabriquees par extract_diag.py.
+// Outil de test. Les donnees viennent de data/diag-*.js, fabriquees par extract_diag.py.
+// Habillage v6 (2026-11-26, v6-test.css) : le test est la copie de l'eleve. On ecrit sur la page reglee, on entoure sa lettre au stylo bleu,
+// la coche rouge du correcteur n'arrive qu'a la fin. Le parcours, les textes et les donnees envoyees n'ont pas change.
 (function(){
 var app=document.getElementById('app'), D=window.DIAG, L=window.LIO, esc=L.esc, fmt=L.fmt;
 var ins=L.lire('lioris_inscription',{});
@@ -11,18 +13,18 @@ function accueil(){
  var nb=niveau?((D.commun?D.blocs[D.commun].questions.length:0)+D.blocs[niveau].questions.length):0;
  var classe=ins.classe||'';if(!classe&&niveau){var cc=D.classes.filter(function(c){return c[1]===niveau;})[0];classe=cc?cc[0]:'';}
  var moi=ins.qui==='moi';
- app.innerHTML='<p class="brand">Lioris</p>'+
- '<figure class="feuille t-couv"><div class="tete"><span>Test gratuit</span><span>'+esc(classe||'Lioris')+'</span></div><div class="corps">'+
-  (ins.eleve?'<p class="t-nom">'+esc(ins.eleve)+'</p>':'')+'<h1>'+esc(D.titre)+'</h1>'+
-  '<ul class="t-faits">'+(nb?'<li><b>'+nb+'</b>questions</li>':'')+'<li><b>'+esc(String(D.duree).replace(/\s*minutes?/,' min'))+'</b>environ</li><li><b>Aucune</b>note</li></ul></div>'+
-  '<figcaption class="pied"><b>À quoi sert ce test</b>Il repère ce qu\'il faut travailler, et dans quel ordre. Ce n\'est pas une note.</figcaption></figure>'+
+ app.innerHTML='<header class="t-couv"><p class="etiquette">Test gratuit'+(classe?'. '+esc(classe)+'.':'.')+'</p>'+
+  '<h1 class="t-titre">'+esc(D.titre)+'</h1>'+
+  (ins.eleve?'<p class="t-nom"><span>Nom</span><span class="eleve">'+esc(ins.eleve)+'</span></p>':'')+
+  '<ul class="t-faits">'+(nb?'<li><b>'+nb+'</b>questions</li>':'')+'<li><b>'+esc(String(D.duree).replace(/\s*minutes?/,' min'))+'</b>environ</li><li><b>Aucune</b>note</li></ul>'+
+  '<p class="t-but">Ce test repère ce qu\'il faut travailler, et dans quel ordre.</p><p class="t-mot" aria-hidden="true">Ce n\'est pas une note.</p><span class="evite">Ce n\'est pas une note.</span></header>'+
  '<h2 class="t-h2">Avant de commencer</h2>'+
  '<ul class="t-regles"><li><i>1</i><span><b>Calcule au brouillon avant de répondre.</b> '+esc(D.calculatrice)+'</span></li>'+
   '<li><i>2</i><span><b>Ne réponds pas au hasard.</b> « Je ne sais pas » nous aide plus qu\'un coup de chance.</span></li>'+
   '<li><i>3</i><span><b>Des questions à choix'+(avecRed?', puis un court exercice à rédiger sur papier':'')+'.</b> Tu peux revenir en arrière à tout moment.</span></li></ul>'+
  '<ol class="t-suite"><li class="ici"><b>Le test</b><span>maintenant</span></li><li><b>Le rendez-vous</b><span>'+(moi?'un professeur t\'explique tes réponses':'un professeur explique tes réponses à ton parent')+'</span></li><li><b>Le plan écrit</b><span>ce qu\'il faut reprendre, dans l\'ordre</span></li></ol>'+
  (niveau?'':'<label for="nv">Ta classe</label><select id="nv">'+D.classes.map(function(c){return '<option value="'+c[1]+'">'+esc(c[0])+'</option>';}).join('')+'</select>')+
- '<button class="btn" id="go">Commencer le test</button>';
+ '<p class="t-go"><button class="btn" id="go">Commencer le test</button></p>';
  document.getElementById('go').onclick=function(){if(!niveau)niveau=document.getElementById('nv').value;
   var qs=(D.commun?D.blocs[D.commun].questions.map(function(q){return {q:q,commun:true};}):[]).concat(D.blocs[niveau].questions.map(function(q){return {q:q,commun:false};}));
   liste=qs.map(function(x){var q=x.q,o=[{t:q.ok,k:'ok'}].concat(q.bad.map(function(b,n){return {t:b,k:'bad'+n};}));return {q:q,commun:x.commun,opts:melange(o)};});
@@ -37,15 +39,15 @@ function question(){
  var LET='ABCDEFGH',min=parseInt(D.duree,10)||0,reste=min?Math.max(1,Math.round(min*(liste.length-i)/liste.length)):0;
  var h='<div class="t-barre"><div class="t-info"><span><b>Question '+(i+1)+'</b> sur '+liste.length+'</span>'+(reste?'<span>encore '+reste+' min environ</span>':'')+'</div>'+
   '<div class="progress" role="progressbar" aria-label="Avancement du test" aria-valuemin="0" aria-valuemax="'+liste.length+'" aria-valuenow="'+i+'"><i style="transform:scaleX('+(prec/liste.length)+')"></i></div></div>'+
-  '<figure class="feuille t-q"><div class="tete"><span>'+esc(D.titre)+'</span><span>'+(i+1)+' / '+liste.length+'</span></div><div class="corps"><h1 class="q" tabindex="-1">'+fmt(q.q)+'</h1></div></figure>';
+  '<div class="t-q"><p class="lab">'+esc(D.titre)+'</p><h1 class="q" tabindex="-1">'+fmt(q.q)+'</h1></div>';
  var bl=D.blocs[it.commun?D.commun:niveau];
  if(bl&&bl.texte){var vise=!bl.texte_ids||bl.texte_ids.indexOf(q.id)>=0;h+='<details class="texte"'+(bl.texte_ids&&vise?' open':'')+'><summary>'+(bl.texte_ids?'Le texte':'Le texte du test, utile pour certaines questions')+'</summary><p>'+esc(bl.texte)+'</p></details>';}
  h+='<div class="t-choix" role="group" aria-label="Réponses proposées">';
  it.opts.forEach(function(o,n){var s=cur&&cur.k===o.k;h+='<button class="opt'+(s?' sel':'')+'" aria-pressed="'+(s?'true':'false')+'" data-k="'+o.k+'"><span class="t-l" aria-hidden="true">'+LET.charAt(n)+ROND+'</span><span class="t-t">'+fmt(o.t)+'</span></button>';});
  h+='</div><div class="t-autres"><button class="opt alt'+(cur&&cur.k==='nsp'?' sel':'')+'" data-k="nsp">Je ne sais pas</button>';
  if(D.pasvu&&!it.commun)h+='<button class="opt alt'+(cur&&cur.k==='pasvu'?' sel':'')+'" data-k="pasvu">Pas encore vu en classe</button>';
- h+='</div><div class="row t-nav">'+(i>0?'<button class="btn ghost" id="prev">Précédent</button>':'')+'<button class="btn" id="next"'+(cur?'':' disabled')+'>'+(i<liste.length-1?'Suivant':(aRedaction()?'Passer à la rédaction':'Terminer le test'))+'</button></div>'+
-  '<p class="small t-aide">Au clavier : les lettres pour choisir, Entrée pour continuer.</p>';
+ h+='</div><div class="t-nav">'+(i>0?'<button class="btn ghost" id="prev">Précédent</button>':'')+'<button class="btn" id="next"'+(cur?'':' disabled')+'>'+(i<liste.length-1?'Suivant':(aRedaction()?'Passer à la rédaction':'Terminer le test'))+'</button></div>'+
+  '<p class="t-aide">Au clavier : les lettres pour choisir, Entrée pour continuer.</p>';
  app.innerHTML=h;t0=Date.now();window.scrollTo(0,0);
  var bar=app.querySelector('.progress i');bar.getBoundingClientRect();bar.style.transform='scaleX('+(i/liste.length)+')';prec=i;
  app.querySelector('.q').focus({preventScroll:true});
@@ -60,10 +62,10 @@ function question(){
 function redaction(){
  var r=D.blocs[niveau].redaction||'';
  app.innerHTML='<div class="t-barre"><div class="t-info"><span><b>Dernière étape</b></span><span>un quart d\'heure environ</span></div><div class="progress"><i></i></div></div>'+
- '<figure class="feuille t-q"><div class="tete"><span>Exercice à rédiger</span><span>sur papier</span></div><div class="corps"><p class="t-red">'+fmt(r).replace(/\n/g,'<br>')+'</p></div>'+
- '<figcaption class="pied"><b>Consigne</b>Rédige sur une feuille, comme sur une copie.'+(D.calculatrice.indexOf('autorisée')>=0?' Calculatrice autorisée pour cet exercice.':'')+'</figcaption></figure>'+
+ '<div class="t-q"><p class="lab">Exercice à rédiger, sur papier</p></div><div class="feuille-e papier t-feuille"><p class="lab">L\'énoncé</p><p class="t-red">'+fmt(r).replace(/\n/g,'<br>')+'</p></div>'+
+ '<p class="t-consigne"><b>Consigne.</b> Rédige sur une feuille, comme sur une copie.'+(D.calculatrice.indexOf('autorisée')>=0?' Calculatrice autorisée pour cet exercice.':'')+'</p>'+
  '<label for="ph">Photo de ta copie</label><input id="ph" type="file" accept="image/*" capture="environment">'+
- '<p class="small">Dans ce squelette, la photo n\'est pas envoyée.</p><button class="btn" id="fin">Terminer le test</button>';
+ '<p class="small">Dans ce squelette, la photo n\'est pas envoyée.</p><p class="t-go"><button class="btn" id="fin">Terminer le test</button></p>';
  window.scrollTo(0,0);
  document.getElementById('fin').onclick=function(){fin(!!document.getElementById('ph').files.length);};
 }
@@ -73,20 +75,20 @@ function fin(photo){
  file=file.filter(function(k){return window.DIAGS[k];});var suivant=file.shift(),moi=ins.qui==='moi';try{sessionStorage.setItem('lioris_file',JSON.stringify(file));}catch(e){}
  if(!suivant&&window.CRM&&window.CRM.nettoyer)window.CRM.depot.then(function(){window.CRM.nettoyer();});
  var lien=suivant?'test.html?pack='+suivant:'';
- app.innerHTML='<p class="brand">Lioris</p><div class="t-fin"><span class="t-ok" aria-hidden="true"><svg viewBox="0 0 48 48"><path pathLength="1" d="M12 25 L21 34 L37 15"/></svg></span>'+
+ app.innerHTML='<div class="t-fin"><span class="t-ok" aria-hidden="true"><svg viewBox="0 0 54 40"><path pathLength="1" d="M4 22 L18 36 L50 4"/></svg></span>'+
   '<h1>'+(suivant?'Ce test est terminé.':'C\'est terminé, merci.')+'</h1>'+
   '<p class="lead">'+(suivant?'Tes réponses sont enregistrées. Il te reste '+(file.length+1)+' étape'+(file.length?'s':'')+' : tu peux faire une pause avant de continuer.':'Tes réponses sont enregistrées. Tu n\'as pas de note : le test sert à savoir quoi travailler.')+'</p></div>'+
-  (suivant?'<p><a class="btn" href="'+lien+'">'+('Passer au test suivant : '+esc(window.DIAGS[suivant].titre))+'</a></p>':'')+
+  (suivant?'<p class="t-go" style="margin:0 0 64px"><a class="btn" href="'+lien+'">'+('Passer au test suivant : '+esc(window.DIAGS[suivant].titre))+'</a></p>':'')+
   '<h2 class="t-h2">Ce qui se passe maintenant</h2>'+
   '<ol class="t-suite"><li class="fait"><b>Le test</b><span>fait</span></li><li class="ici"><b>Le rendez-vous</b><span>'+(moi?'un professeur t\'explique tes réponses en visio':'un professeur explique tes réponses à ton parent, en visio')+'</span></li><li><b>Le plan écrit</b><span>ce qu\'il faut reprendre, dans l\'ordre</span></li></ol>'+
-  (suivant?'':'<p class="note">'+(moi?'Tu reçois un email avec la date et l\'heure du rendez-vous.':'Ton parent reçoit un email avec la date et l\'heure du rendez-vous.')+'</p>')+
+  (suivant?'':'<p class="t-note">'+(moi?'Tu reçois un email avec la date et l\'heure du rendez-vous.':'Ton parent reçoit un email avec la date et l\'heure du rendez-vous.')+'</p>')+
   '';
  window.scrollTo(0,0);
 }
 // Arrivee par le lien de l'email : on demande a la base a qui est ce test. Lien inconnu ou deja utilise : on le dit, sans laisser repasser le test.
-function message(titre,texte){app.innerHTML='<p class="brand">Lioris</p><h1>'+titre+'</h1><p class="lead">'+texte+'</p><p class="small">Une question ? Écrivez à <a href="mailto:contact@lioris.fr">contact@lioris.fr</a>.</p>';}
+function message(titre,texte){app.innerHTML='<div class="t-msg"><h1>'+titre+'</h1><p class="lead">'+texte+'</p></div><p class="small">Une question ? Écrivez à <a href="mailto:contact@lioris.fr">contact@lioris.fr</a>.</p>';}
 if(JETON&&window.CRM&&window.CRM.enLigne()){
- app.innerHTML='<p class="brand">Lioris</p><p class="lead">Ouverture du test…</p>';
+ app.innerHTML='<div class="t-msg"><p class="lead">Ouverture du test…</p></div>';
  window.CRM.ouvrir(JETON).then(function(o){
   if(!o||o.cle!==window.PACK){message('Ce lien ne correspond pas à ce test.','Reprenez le lien reçu par email, sans le modifier.');return;}
   if(o.utilise){message('Ce test a déjà été passé.','Les réponses sont bien arrivées. Un professeur les explique pendant le rendez-vous.');return;}
