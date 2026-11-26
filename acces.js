@@ -16,7 +16,9 @@ function local(d){var p=function(n){return (n<10?'0':'')+n;};return d.getFullYea
 function tag(t,k){return '<span class="tag '+(k||'')+'">'+h(t)+'</span>';}
 function val(i){var e=document.getElementById(i);return e?e.value.trim():'';}
 function titre(k){var N={'college-seconde':'Collège et seconde','premiere-terminale-18h':'Première et terminale','prepa-superieur-18h':'BTS et licence','prepa-physique-chimie-18h':'Prépa, physique ou chimie','maths-premiere-terminale-24h':'Maths, première et terminale','maths-prepa-24h':'Maths, prépa'};return (Object.prototype.hasOwnProperty.call(N,k)&&N[k])||(window.DIAGS&&Object.prototype.hasOwnProperty.call(window.DIAGS,k)&&window.DIAGS[k].titre)||k;}
-function rpc(nom,corps){return fetch(CFG.url+'/rest/v1/rpc/'+nom,{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.cle},body:JSON.stringify(corps)}).then(function(r){return r.text().then(function(x){if(!r.ok)throw new Error(x);return x?JSON.parse(x):null;});});}
+// Page d'exemple : #demo=parent ou #demo=professeur. Donnees fictives (acces-demo.js), aucun appel a la base.
+var DEMO=(/[#&]demo=(parent|professeur)\b/.exec(location.hash)||[])[1]||'';
+function rpc(nom,corps){if(DEMO)return Promise.resolve(null);return fetch(CFG.url+'/rest/v1/rpc/'+nom,{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.cle},body:JSON.stringify(corps)}).then(function(r){return r.text().then(function(x){if(!r.ok)throw new Error(x);return x?JSON.parse(x):null;});});}
 // Groupe d'un domaine : meme regle de seuils que le test (provisoire, ecrite dans chaque test). n = questions tentees, err = non reussies.
 function groupe(D0,n,err){if(n===0)return 'pasvu';if(n<3)return 'peu';if(D0.seuils==='pourcent'){var r=(n-err)/n;return r>=0.8?'sat':r>=0.5?'fra':'bes';}if(D0.seuils==='prepa'&&n>=5)return err<=1?'sat':err===2?'fra':'bes';return err===0?'sat':err===1?'fra':'bes';}
 function lecture(t){var D0=window.DIAGS&&Object.prototype.hasOwnProperty.call(window.DIAGS,t.cle)?window.DIAGS[t.cle]:null,o={ok:0,total:0,erreurs:[],sans:0,nsp:0,titre:D0?D0.titre:t.cle,domaines:[]};if(!D0||!D0.blocs)return o;
@@ -129,7 +131,16 @@ function vueProf(){var S=toutesSeances(),now=Date.now();
  return o;}
 
 function dessine(){document.getElementById('qui').textContent={professeur:'Page du professeur',parent:'Page du parent',eleve:'Page de l\'élève'}[P.type]||'';z.innerHTML=P.type==='professeur'?vueProf():P.type==='parent'?vueParent():vueEleve();}
-function charge(){return rpc('page_lien',{p_jeton:J}).then(function(d){P=d;dessine();});}
+// Vue de l'administration (2026-11-26, demande d'ad) : ouverte depuis le poste de pilotage avec « &vue=admin », la page se lit par une fonction
+// reservee a l'administrateur connecte, qui ne compte pas la visite. Le parent ou le professeur garde ainsi un compteur d'ouvertures juste.
+var ADMIN=/[#&]vue=admin\b/.test(location.hash);
+function sesAdmin(){try{var s=JSON.parse(localStorage.getItem('lioris_session')||'null');return s&&s.access_token&&s.expire>Date.now()+5000?s.access_token:null;}catch(e){return null;}}
+function charge(){
+ if(DEMO){P=P||window.LIO_DEMO()[DEMO];dessine();z.insertAdjacentHTML('afterbegin','<div class="bloc" role="note" style="border-left:4px solid #D23F2A"><p style="margin:0"><b>Page d\'exemple.</b> Les personnes et les données sont fictives. Les boutons n\'enregistrent rien.</p></div>');return Promise.resolve();}
+ if(!ADMIN)return rpc('page_lien',{p_jeton:J}).then(function(d){P=d;dessine();});
+ var tk=sesAdmin();if(!tk){z.innerHTML='<div class="bloc"><h2>Session d\'administration à rouvrir</h2><p style="margin:0">Ouvrez le poste de pilotage, puis recliquez sur « Voir la page ».</p></div>';return Promise.resolve();}
+ return fetch(CFG.url+'/rest/v1/rpc/page_lien_admin',{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.cle,Authorization:'Bearer '+tk},body:JSON.stringify({p_jeton:J})}).then(function(r){return r.text().then(function(x){if(!r.ok)throw new Error(x);return x?JSON.parse(x):null;});})
+  .then(function(d){P=d;dessine();z.insertAdjacentHTML('afterbegin','<div class="bloc" role="note" style="border-left:4px solid #2343D6"><p style="margin:0"><b>Vue de l\'administration.</b> Vous voyez cette page comme son destinataire. Cette visite n\'est pas comptée. Attention : les boutons de cette page agissent pour de vrai.</p></div>');});}
 function refuse(){z.innerHTML='<div class="bloc"><h1 style="font-size:24px">Ce lien ne marche pas</h1><p style="margin:8px 0 0">Il a peut-être été remplacé par un lien plus récent. Écrivez-nous à <a href="mailto:contact@lioris.fr">contact@lioris.fr</a> : nous vous en envoyons un neuf.</p></div>';}
 document.addEventListener('click',function(ev){var t=ev.target.closest&&ev.target.closest('[data-a]');if(!t)return;var a=t.getAttribute('data-a'),id=t.getAttribute('data-id');
  if(a==='onglet'){onglet=+id;dessine();}
@@ -147,5 +158,5 @@ document.addEventListener('click',function(ev){var t=ev.target.closest&&ev.targe
   if(et==='reportée'&&nq){if(isNaN(new Date(nq).getTime())||new Date(nq).getTime()<Date.now()-864e5){m.textContent='La nouvelle date doit être à venir.';t.disabled=false;return;}corps.p_quand=new Date(nq).toISOString();}
   rpc('prof_seance',corps).then(function(){ouvert=null;return charge();}).catch(function(){t.disabled=false;m.textContent='Enregistrement refusé. Réessayez, ou écrivez à contact@lioris.fr.';});}
 });
-if(!J||!CFG.url||!CFG.cle)refuse();else charge().catch(refuse);
+if(DEMO&&window.LIO_DEMO)charge().catch(refuse);else if(!J||!CFG.url||!CFG.cle)refuse();else charge().catch(refuse);
 })();
