@@ -23,7 +23,7 @@ function v(i){return document.getElementById(i).value;}
 document.getElementById('f').addEventListener('submit',function(e){e.preventDefault();
  var cl=document.getElementById('cl'),classe=cl.options[cl.selectedIndex].text,eleve=MOI?v('pp'):v('pe');
  // Une fiche d'inscription par test, pour que chaque test retrouve le prenom et la classe. Le code de niveau depend du test : on le retrouve par le nom de la classe.
- PACKS.forEach(function(k){var G=window.DIAGS[k],mot=classe.split(/[ ,]/)[0],c=(k===window.PACK)?[classe,v('cl')]:(G.classes.filter(function(x){return x[0].split(/[ ,]/)[0]===mot;})[0]||[classe,null]);
+ PACKS.forEach(function(k){var G=window.DIAGS[k],mot=classe.split(/[ ,]/)[0],c=(k===window.PACK)?[classe,v('cl')]:(G.classes.filter(function(x){return x[0]===classe;})[0]||G.classes.filter(function(x){return x[0].split(/[ ,]/)[0]===mot;})[0]||[classe,null]);
   try{localStorage.setItem('lioris_inscription_'+k,JSON.stringify({parent:v('pp'),email:v('em'),tel:v('tel'),eleve:eleve,niveau:c[1],classe:classe,creneau:CRENEAU,contact:true,qui:MOI?'moi':'enfant',date:new Date().toISOString()}));}catch(e){}});
  try{sessionStorage.setItem('lioris_file',JSON.stringify(SUITE));}catch(e){}
  if(window.CRM)window.CRM.inscription({parent:v('pp'),email:v('em'),tel:v('tel'),eleve:eleve,niveau:v('cl'),classe:classe,creneau:CRENEAU,contact:true,accord:document.getElementById('c1').checked,packs:PACKS,qui:MOI?'moi':'enfant',origine:'site'});

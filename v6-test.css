@@ -46,6 +46,9 @@
 .t6 .t-suite li.fait span { color:var(--vert); font-weight:700; }
 .t6 .t-suite li.fait b { color:var(--gris); }
 .t6 .t-go { margin:48px 0 0; }
+.t6 .t-reprise { margin:32px 0 -16px; padding:20px 0 24px; border-top:1.5px solid var(--stylo); border-bottom:1px solid var(--filet); }
+.t6 .t-reprise p { font-size:20px; margin:0 0 20px; }
+.t6 .t-reprise b { font-family:var(--titre); }
 .t6 .t-go .btn { min-width:min(100%, 340px); }
 
 /* ---------- une question : écrite sur la page, on entoure sa lettre */
