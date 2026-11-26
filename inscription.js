@@ -52,9 +52,13 @@ document.getElementById('f').addEventListener('submit',function(e){e.preventDefa
   try{localStorage.setItem('lioris_inscription_'+k,JSON.stringify({parent:v('pp'),email:v('em'),tel:v('tel'),eleve:eleve,niveau:c[1],classe:classe,creneau:CRENEAU,contact:true,qui:MOI?'moi':'enfant',date:new Date().toISOString()}));}catch(e){}});
  try{sessionStorage.setItem('lioris_file',JSON.stringify(SUITE));}catch(e){}
  if(window.CRM)window.CRM.inscription({parent:v('pp'),email:v('em'),tel:v('tel'),eleve:eleve,niveau:nivP,classe:classe,creneau:CRENEAU,contact:true,accord:document.getElementById('c1').checked,packs:PACKS,qui:MOI?'moi':'enfant',origine:'site'});
+ var EMAIL=v('em');
  // Etape 2 : le creneau du rendez-vous, choisi dans l'agenda Cal.com (rien n'est passe dans l'adresse : le parent redonne son nom et son email a Cal.com).
  app.innerHTML='<header class="t-couv"><p class="etiquette">Inscription enregistrée.</p><h1 class="t-titre moyen">Choisissez le créneau du rendez-vous</h1></header>'+
   '<p class="lead">'+(MOI?'Un professeur vous explique vos résultats en visio. ':'Un professeur vous explique les résultats de votre enfant en visio. ')+'Prenez un créneau qui laisse le temps de passer '+(plusieurs?'les tests':'le test')+' avant.</p>'+
+  // Constat du 2026-11-26 (essai d'ad) : l'email du lien est arrive dans les indesirables, et l'agenda a recu une autre adresse que l'inscription.
+  '<p class="t-note"><b>Regardez vos emails.</b> Le lien '+(plusieurs?'des tests':'du test')+' part à <b>'+L.esc(EMAIL)+'</b>. S\'il n\'est pas dans votre boîte de réception, ouvrez le dossier « Indésirables » ou « Spam », puis cliquez sur « Non spam ».</p>'+
+  '<p class="t-note" style="margin-bottom:32px"><b>Dans l\'agenda, donnez cette même adresse email.</b> C\'est elle qui relie le rendez-vous à votre inscription.</p>'+
   '<iframe class="agenda" title="Choisir le créneau du rendez-vous" src="'+AGENDA+'?theme=light"></iframe>'+
   '<p class="small">L\'agenda ne s\'affiche pas ? <a href="'+AGENDA+'" target="_blank" rel="noopener">Ouvrez-le dans un nouvel onglet</a>. Vous pourrez déplacer ce créneau depuis l\'email de confirmation.</p>'+
   '<p class="t-go"><a class="btn" href="test.html?pack='+window.PACK+'">'+(plusieurs?'Passer au premier test':'Passer au test')+'</a></p>'+

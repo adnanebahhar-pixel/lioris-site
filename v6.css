@@ -442,3 +442,6 @@ footer nav { display:flex; flex-wrap:wrap; gap:6px 24px; }
 }
 
 @media print { .js .ecrit { clip-path:none; } .js .trace path { stroke-dashoffset:0; } .js .carte, .js .tampon, .js .pose, .js .etapes li { opacity:1; transform:none; } .apercu { display:none; } }
+/* Le prix par semaine, sous le prix du programme (2026-11-26). */
+.par-sem { font:500 20px/32px var(--texte); max-width:680px; margin:8px 0 32px; }
+.par-sem b { font-weight:700; }
