@@ -67,7 +67,7 @@ function question(){
  h+='<div class="t-choix" role="group" aria-label="Réponses proposées">';
  it.opts.forEach(function(o,n){var s=cur&&cur.k===o.k;h+='<button class="opt'+(s?' sel':'')+'" aria-pressed="'+(s?'true':'false')+'" data-k="'+o.k+'"><span class="t-l" aria-hidden="true">'+LET.charAt(n)+ROND+'</span><span class="t-t">'+fmt(o.t)+'</span></button>';});
  h+='</div><div class="t-autres"><button class="opt alt'+(cur&&cur.k==='nsp'?' sel':'')+'" data-k="nsp">Je ne sais pas</button>';
- if(D.pasvu&&!it.commun)h+='<button class="opt alt'+(cur&&cur.k==='pasvu'?' sel':'')+'" data-k="pasvu">Pas encore vu en classe</button>';
+ if(D.pasvu)h+='<button class="opt alt'+(cur&&cur.k==='pasvu'?' sel':'')+'" data-k="pasvu">Pas encore vu en classe</button>';
  h+='</div><div class="t-nav">'+(i>0?'<button class="btn ghost" id="prev">Précédent</button>':'')+'<button class="btn" id="next"'+(cur?'':' disabled')+'>'+(i<liste.length-1?'Suivant':(aRedaction()?'Passer à la rédaction':'Terminer le test'))+'</button></div>'+
   '<p class="t-aide">Au clavier : les lettres pour choisir, Entrée pour continuer.</p>';
  app.innerHTML=h;t0=Date.now();window.scrollTo(0,0);etape='q';garder();

@@ -15,6 +15,10 @@ window.DIAGS["physique-superieur"] = {
   [
    "Première année du supérieur",
    "S"
+  ],
+  [
+   "Deuxième année du supérieur",
+   "S"
   ]
  ],
  "duree": "55 minutes",
